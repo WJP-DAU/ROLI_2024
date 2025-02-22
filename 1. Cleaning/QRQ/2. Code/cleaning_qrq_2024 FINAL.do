@@ -93,12 +93,12 @@ do "${path2dos}/Routines/data_import_ph.do"
 =================================================================================================================*/
 
 clear
-use "$path2exp\cc_final.dta"
-append using "$path2exp\cj_final.dta"
-append using "$path2exp\lb_final.dta"
-append using "$path2exp\ph_final.dta"
+use "$path2data\1.Original\cc_final.dta"
+append using "$path2data\1.Original\cj_final.dta"
+append using "$path2data\1.Original\lb_final.dta"
+append using "$path2data\1.Original\ph_final.dta"
 
-save "$path2exp\qrq.dta", replace
+save "$path2data\1.Original\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -116,7 +116,7 @@ do "${path2dos}/Routines/common_q.do"
 
 sort country question id_alex
 
-save "$path2exp\1. Original\qrq.dta", replace
+save "$path2data\1.Original\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -125,37 +125,37 @@ save "$path2exp\1. Original\qrq.dta", replace
 
 /* Responded in 2023 */
 clear
-use "$path2exp\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_2023.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2exp\1. Original\qrq_2023_login.dta", replace
+save "$path2data\1. Original\qrq_2023_login.dta", replace
 
 
 /* Responded longitudinal survey in 2024 */ 
 clear
-use "$path2exp\1. Original\qrq.dta"
+use "$path2data\1. Original\qrq.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2exp\1. Original\qrq_login.dta", replace 
+save "$path2data\1. Original\qrq_login.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Login) */
 clear
-use "$path2exp\1. Original\qrq_2023_login.dta"
+use "$path2data\1. Original\qrq_2023_login.dta"
 merge 1:1 WJP_password using "$path2exp\1. Original\qrq_login.dta"
 keep if _merge==1
 drop _merge
 sort WJP_password
-save "$path2exp\1. Original\qrq_2023_login_unique.dta", replace 
+save "$path2data\1. Original\qrq_2023_login_unique.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Full data) */
 clear
-use "$path2exp\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_2023.dta"
 sort WJP_password
-merge m:1 WJP_password using "$path2exp\1. Original\qrq_2023_login_unique.dta"
+merge m:1 WJP_password using "$path2data\1. Original\qrq_2023_login_unique.dta"
 
 replace _merge=3 if id_alex=="lb_English_1_28_2021_2022" // LB Gambia expert that answered CC in 2023 but not LB (old LB answer from 2021) DO NOT DELETE NEXT YEAR!!!!!!!!!!!!!!!!!!!!!!!!!!! CHECK IT!!!!!!
 replace _merge=3 if id_alex=="lb_English_0_587_2022" //LB Grenada that switched disciplines over years and are long CCs. DO NOT DELETE NEXT YEAR!!!!!!!!
@@ -171,17 +171,17 @@ egen id_alex_1=concat(id_alex aux), punct(_)
 replace id_alex=id_alex_1
 drop id_alex_1 aux
 sort WJP_password
-save "$path2exp\1. Original\qrq_2023.dta", replace
+save "$path2data\1. Original\qrq_2023.dta", replace
 
-erase "$path2exp\1. Original\qrq_2023_login.dta"
-erase "$path2exp\1. Original\qrq_login.dta"
-erase "$path2exp\1. Original\qrq_2023_login_unique.dta"
+erase "$path2data\1. Original\qrq_2023_login.dta"
+erase "$path2data\1. Original\qrq_login.dta"
+erase "$path2data\1. Original\qrq_2023_login_unique.dta"
 
 
 /* Merging with 2023 data and older regular data*/
 clear
-use "$path2exp\1. Original\qrq.dta"
-append using "$path2exp\1. Original\qrq_2023.dta"
+use "$path2data\1. Original\qrq.dta"
+append using "$path2data\1. Original\qrq_2023.dta"
 
 *Dropping total scores from previous years
 drop total_score total_n f_1* f_2* f_3* f_4* f_6* f_7* f_8* N total_score_mean total_score_sd outlier outlier_CO
