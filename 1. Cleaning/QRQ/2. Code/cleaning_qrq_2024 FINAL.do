@@ -42,12 +42,12 @@ if (inlist("`c(username)'", "nrodriguez")) {
 *--- Defining path to Data and DoFiles:
 
 **Path2data: Path to original exports from Alchemer by QRQ team. 
-global path2data "${path2GH}/1. Data"
+global path2data "${path2GH}\1. Data"
 
 **Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
 
 **Path 2dos: Path to do-files (Routines). 
-global path2dos  "${path2GH}/2. Code"
+global path2dos  "${path2GH}\2. Code"
 
 
 
