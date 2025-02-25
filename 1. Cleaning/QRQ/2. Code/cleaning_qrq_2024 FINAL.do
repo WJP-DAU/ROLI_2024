@@ -30,7 +30,7 @@ version 15
 
 *------ (a) Natalia Rodriguez:
 if (inlist("`c(username)'", "nrodriguez")) {
-	global path2SP ""
+	global path2SP "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Data Analytics\7. WJP ROLI\ROLI_2024\1. Cleaning\QRQ"
 	global path2GH "C:\Users\nrodriguez\OneDrive - World Justice Project\Natalia\GitHub\ROLI_2024\1. Cleaning\QRQ"
 	
 	*global path2data "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\QRQ\QRQ 2024\Final Data\excel"
@@ -42,16 +42,12 @@ if (inlist("`c(username)'", "nrodriguez")) {
 *--- Defining path to Data and DoFiles:
 
 **Path2data: Path to original exports from Alchemer by QRQ team. 
-global path2data "${path2GH}\1. Data"
+global path2data "${path2SP}\1. Data"
 
 **Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
 
 **Path 2dos: Path to do-files (Routines). 
 global path2dos  "${path2GH}\2. Code"
-
-
-
-
 
 
 
@@ -93,12 +89,12 @@ do "${path2dos}/Routines/data_import_ph.do"
 =================================================================================================================*/
 
 clear
-use "$path2data\1.Original\cc_final.dta"
-append using "$path2data\1.Original\cj_final.dta"
-append using "$path2data\1.Original\lb_final.dta"
-append using "$path2data\1.Original\ph_final.dta"
+use "${path2data}\1. Original\cc_final.dta"
+append using "${path2data}\1. Original\cj_final.dta"
+append using "${path2data}\1. Original\lb_final.dta"
+append using "${path2data}\1. Original\ph_final.dta"
 
-save "$path2data\1.Original\qrq.dta", replace
+save "${path2data}\1. Original\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -116,7 +112,7 @@ do "${path2dos}/Routines/common_q.do"
 
 sort country question id_alex
 
-save "$path2data\1.Original\qrq.dta", replace
+save "$path2data\1. Original\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -144,7 +140,7 @@ save "$path2data\1. Original\qrq_login.dta", replace
 /* Only answered in 2023 (and not in 2024) (Login) */
 clear
 use "$path2data\1. Original\qrq_2023_login.dta"
-merge 1:1 WJP_password using "$path2exp\1. Original\qrq_login.dta"
+merge 1:1 WJP_password using "$path2data\1. Original\qrq_login.dta"
 keep if _merge==1
 drop _merge
 sort WJP_password
@@ -7204,7 +7200,7 @@ br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f
 drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
-save "$path2exp\qrq.dta", replace
+save "$path2data\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -7299,7 +7295,7 @@ drop total_score- total_score_mean
 *order WJP_password cc_q6a_usd cc_q6a_gni, last
 order WJP_password, last
 drop WJP_password
-save "$path2exp\qrq_country_averages.dta", replace
+save "$path2data\qrq_country_averages.dta", replace
 
 br
 
