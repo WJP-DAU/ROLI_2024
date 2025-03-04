@@ -1,6 +1,14 @@
-****************************************
-**** Scores only with QRQ questions ****
-****************************************
+/*=================================================================================================================
+Project:		Global ROLI QRQ cleaning and analysis
+Routine:		QRQ Scores routine
+Author(s):		Natalia Rodriguez 	(nrodriguez@worldjusticeproject.org)
+Dependencies:  	World Justice Project
+Creation Date:	February, 2025
+
+Description:
+This routine will create the factor, sub-factor and other scores using ONLY the QRQ Global ROLI data.
+
+=================================================================================================================*/
 
 
 * Change the delimitation for each command, to allow better understanding of the do file. 
