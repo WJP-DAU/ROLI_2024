@@ -159,10 +159,29 @@ foreach v of varlist *_norm {
 	g outlier_lo_`v'=0
 	replace outlier_lo_`v'=1 if `v'==`v'_min & `v'!=.
 	
-	drop `v'_max `v'_min
+	*Generating # of answers per question
+	bys country: egen `v'_c=count(`v')
+	
+	*Counting # of outliers (max values) per question
+	bys country: egen `v'_hi_t=total(outlier_hi_`v')
+	
+	*Counting # of outliers (low values) per question
+	bys country: egen `v'_lo_t=total(outlier_lo_`v')
+	
+	*Creating proportions for all outliers
+	bys country: gen `v'_hi_p=`v'_hi_t/`v'_c
+	bys country: gen `v'_lo_p=`v'_lo_t/`v'_c
+	
+	drop `v'_max `v'_min `v'_c `v'_hi_t `v'_lo_t
 }
 
 
+
+/*
+bys country: egen all_q4_norm_c=count(all_q4_norm)
+bys country: egen all_q4_norm_t=total(outlier_hi_all_q4_norm)
+bys country: gen all_q4_norm_p=all_q4_norm_t/all_q4_norm_c
+*/
 
 
 

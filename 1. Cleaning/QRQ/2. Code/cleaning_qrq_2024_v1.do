@@ -341,6 +341,10 @@ egen total_n=rownonmiss(cc_q1_norm- ph_q14_norm)
 *Total number of experts by country
 bysort country: gen N=_N
 
+*Total number of experts by country and discipline
+bysort country question: gen N_questionnaire=_N
+
+
 *Number of questions per QRQ
 *CC: 162
 *CJ: 197
@@ -361,7 +365,7 @@ qui do "${path2dos}/Routines/scores.do"
 
 
 ********************************************************
-		/* 6. Dropping the tail / old experts */
+		/* 5. Dropping the tail / old experts */
 ********************************************************
 
 sort country question year total_score
@@ -412,15 +416,97 @@ drop if tail_lb==1 & lb_total_new>=15
 drop if tail_ph==1 & ph_total_new>=15
 
 
+drop N N_questionnaire
+
 ********************************************************
-				 /* 5. Outliers */
+				 /* 6. Outliers */
 ********************************************************
 
-qui do "${path2dos}/Routines/outliers.do"
+*Total number of experts by country
+bysort country: gen N=_N
 
-*drop if outlier==1 & N>20
+*Total number of experts by country and discipline
+bysort country question: gen N_questionnaire=_N
 
-*sort country id_alex
+
+qui do "${path2dos}\Routines\outliers.do"
+
+
+*----- Aggregate Scores - NO DELETIONS (scenario 1)
+
+preserve
+
+collapse (mean) cc_q1_norm- all_q105_norm, by(country)
+
+do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+
+restore
+
+
+*----- Aggregate Scores - Removing general outliers (scenario 2)
+
+preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+collapse (mean) cc_q1_norm- all_q105_norm, by(country)
+
+do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s2.dta", replace
+
+restore
+
+
+*----- Aggregate Scores - Removing sub-factor outliers + general outliers (scenario 3)
+
+*preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Dropping questions in sub-factor for experts that are outliers in that indicator
+do "${path2dos}\Routines\subfactor_questions.do"
+
+/*
+#delimit ;
+foreach v in 
+f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 
+f_2_1 f_2_2 f_2_3 f_2_4
+f_3_1 f_3_2 f_3_3 f_3_4
+f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8
+f_5_3
+f_6_1 f_6_2 f_6_3 f_6_4 f_6_5
+f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7
+f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
+f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 
+{;
+	foreach x of global ``v'' { ;
+		replace ``x''=. if outlier_`v'==1 ;	
+};
+};
+#delimit cr
+*/
+
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
+	foreach x of global "`v'" {
+		replace ``x''=. if outlier_`v'==1 
+}
+}
+
+
+
+collapse (mean) cc_q1_norm- all_q105_norm, by(country)
+
+do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s3.dta", replace
+
+restore
+
 
 
 
@@ -431,7 +517,7 @@ qui do "${path2dos}/Routines/outliers.do"
 
 sort country question year total_score
 
-
+/*
 *Afghanistan
 drop if id_alex=="cc_English_1_1104" //Afghanistan
 drop if id_alex=="cj_English_1_136" //Afghanistan
@@ -7000,10 +7086,10 @@ replace cc_q26a_norm =. if id_alex=="cc_English_0_1574" //Zambia /* Disminuyo la
 replace cc_q26b_norm =. if id_alex=="cc_English_0_1611_2022_2023" //Zambia /* Disminuyo la magnitud del cambio negativo del sf7.6 */
 replace all_q59_norm =. if id_alex=="cc_English_0_465_2022_2023" //Zambia /* Disminuyo la magnitud del cambio positivo del sf7.7 */
 replace cc_q14a_norm =. if id_alex=="cc_English_0_465_2022_2023" //Zambia /* Disminuyo la magnitud del cambio positivo del sf7.7 */
-replace all_q90_norm=. if country=="Zambia" //Zambia / Numeros muy altos. El anio pasado lo borramos */
-replace all_q91_norm=. if country=="Zambia" //Zambia / Numeros muy altos. El anio pasado lo borramos */
+replace all_q90_norm=. if country=="Zambia" //Zambia /* Numeros muy altos. El anio pasado lo borramos */
+replace all_q91_norm=. if country=="Zambia" //Zambia /* Numeros muy altos. El anio pasado lo borramos */
 replace cc_q33_norm=. if id_alex=="cc_English_0_888_2022_2023" //Zambia /* Disminuyo la magnitud del cambio positivo del sf1.4 */
-replace all_q24_norm=. if country=="Zambia" //Zambia / Numeros muy altos. El anio pasado lo borramos */
+replace all_q24_norm=. if country=="Zambia" //Zambia /* Numeros muy altos. El anio pasado lo borramos */
 replace cc_q9c_norm =. if id_alex=="cc_English_0_153" //Zambia /* Disminuyo la magnitud del cambio positivo del sf3.4 */
 replace cc_q40a_norm =. if id_alex=="cc_English_0_153" //Zambia /* Disminuyo la magnitud del cambio positivo del sf3.4 */
 replace cc_q40b_norm =. if id_alex=="cc_English_0_153" //Zambia /* Disminuyo la magnitud del cambio positivo del sf3.4 */
@@ -7183,8 +7269,12 @@ replace  cj_q7b_norm =. if id_alex=="cj_English_1_797_2023" /* Zimbabwe */
 replace  cj_q7a_norm =. if id_alex=="cj_English_1_860_2023" /* Zimbabwe */  
 replace  cj_q36c_norm =. if id_alex=="cj_English_0_55" /* Zimbabwe */  
 
+*/
+*/
 
-br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Zimbabwe" 
+
+
+br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Vietnam" 
 
 
 
