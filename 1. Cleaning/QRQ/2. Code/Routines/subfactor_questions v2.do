@@ -17,7 +17,8 @@ This routine will generate each XXX
 
 *                                   Factor 1 ; 
 
-global f_1_2 "all_q1_norm
+global f_1_2 "
+all_q1_norm
 all_q2_norm
 all_q20_norm
 all_q21_norm" ; 
@@ -39,80 +40,59 @@ cj_q38_norm
 cj_q36c_norm
 cj_q8_norm" ; 
 
-global f_1_5_1 "
+global f_1_5 "
 all_q52_norm
 all_q53_norm
-all_q93_norm" ; 
+all_q93_norm
 
-global f_1_5_2 "
 all_q10_norm
-all_q11_norm" ; 
+all_q11_norm 
 
-global f_1_5_3 " 
-all_q12_norm" ; 
+all_q12_norm
 
-global f_1_5_4 "
 cj_q36b_norm
 cj_q36a_norm
 cj_q9_norm
 cj_q8_norm" ; 
 
-global f_1_5 "f_1_5_1 f_1_5_2 f_1_5_3 f_1_5_4" ;
-
-global f_1_6_1 "
+global f_1_6 "
 all_q13_norm
-all_q14_norm" ; 
+all_q14_norm
 
-global f_1_6_2 "
 all_q15_norm
 all_q16_norm
 all_q17_norm
 cj_q10_norm
 all_q18_norm
-all_q94_norm" ; 
+all_q94_norm
 
-global f_1_6_3_A "
-all_q19_norm" ; 
+all_q19_norm
 
-global f_1_6_3_B "
 all_q20_norm
 all_q21_norm" ; 
 
-global f_1_6_3 "f_1_6_3*" ;  
-
-
-global f_1_6 "f_1_6_1 f_1_6_2 f_1_6_3" ;
-
-global f_1_7_A "
-all_q23_norm"; 
-
-global f_1_7_B "
-all_q27_norm" ; 
-
 global f_1_7 "
+all_q23_norm 
+
+all_q27_norm
+
 all_q22_norm
 all_q24_norm
 all_q25_norm
 all_q26_norm
-all_q8_norm
-f_1_7_A
-f_1_7_B"; 
+all_q8_norm"; 
+
 
 *                                   Factor 2 ; 
 
-global f_2_1_1_A "
+global f_2_1 "
 cc_q27_norm
-all_q97_norm" ; 
+all_q97_norm
 
-global f_2_1_1_B "
 ph_q5a_norm
 ph_q5b_norm
-ph_q7_norm " ; 
+ph_q7_norm
 
-global f_2_1_1 "f_2_1_1_*" ; 
-
-
-global f_2_1_2_1_A "
 cc_q28a_norm
 cc_q28b_norm
 cc_q28c_norm
@@ -120,11 +100,8 @@ cc_q28d_norm
 all_q56_norm
 lb_q17e_norm
 lb_q17c_norm
-ph_q8d_norm" ; 
+ph_q8d_norm
 
-global f_2_1_2_1 "f_2_1_2_1_*" ; 
-
-global f_2_1_2_2_A "
 lb_q17b_norm
 ph_q8c_norm
 ph_q8e_norm
@@ -136,31 +113,23 @@ ph_q12a_norm
 ph_q12b_norm
 ph_q12c_norm
 ph_q12d_norm
-ph_q12e_norm" ; 
+ph_q12e_norm
  
-global f_2_1_2_2 "f_2_1_2_2_*" ; 
-
-global f_2_1_2_3 "
 all_q54_norm
-all_q55_norm" ; 
+all_q55_norm
 
-global f_2_1_2 "f_2_1_2_1 f_2_1_2_2 f_2_1_2_3" ; 
- 
-global f_2_1_3 "
 all_q95_norm" ; 
 
-global f_2_1 "f_2_1_1 f_2_1_2 f_2_1_3" ; 
 
-global f_2_2_1 "
+global f_2_2 "
 all_q57_norm
 all_q58_norm
 all_q59_norm
 all_q60_norm
 cc_q26h_norm
 cc_q28e_norm
-lb_q6c_norm  " ; 
+lb_q6c_norm 
 
-global f_2_2_2 "
 cj_q32b_norm
 all_q28_norm
 all_q6_norm
@@ -171,10 +140,8 @@ cj_q33b_norm
 cj_q33c_norm
 cj_q33d_norm
 cj_q33e_norm" ;
-
-global f_2_2 "f_2_2_1 f_2_2_2" ; 
  
-global f_2_3_A " 
+global f_2_3 " 
 cj_q32c_norm
 cj_q32d_norm
 all_q61_norm
@@ -188,14 +155,12 @@ cj_q34e_norm
 cj_q16j_norm
 cj_q18a_norm" ; 
 
-global f_2_3 "f_2_3_*" ; 
-
 global f_2_4 "
 all_q96_norm" ; 
 
 *                                Factor 3 ; 
 
-global f_3_1_1 "
+global f_3_1 "
 all_q33_norm
 all_q34_norm
 all_q35_norm
@@ -205,23 +170,17 @@ all_q38_norm
 cc_q32h_norm
 cc_q32i_norm" ; 
 
-global f_3_1 "f_3_1_*" ; 
-
-global f_3_2_2 " 
+global f_3_2 " 
 cc_q9b_norm
-cc_q39a_norm "; 
+cc_q39a_norm
 
-global f_3_2_3 " 
-cc_q39b_norm " ; 
+cc_q39b_norm
 
-global f_3_2_4 " 
-cc_q39d_norm " ; 
+cc_q39d_norm
 
-global f_3_2_5 "
 cc_q39c_norm
-cc_q39e_norm " ; 
+cc_q39e_norm 
 
-global f_3_2_6 " 
 all_q40_norm
 all_q41_norm
 all_q42_norm
@@ -231,51 +190,32 @@ all_q45_norm
 all_q46_norm
 all_q47_norm " ; 
 
-global f_3_2 " f_3_2_*" ; 
-
-global f_3_3_1_A_1 "
+global f_3_3 "
 all_q13_norm
-all_q14_norm" ; 
+all_q14_norm
 
-global f_3_3_1_A "f_3_3_1_A_* " ; 
-
-global f_3_3_1_B_1 " 
 all_q15_norm
 all_q16_norm
 all_q17_norm
 cj_q10_norm
 all_q18_norm
-all_q94_norm" ; 
+all_q94_norm
 
-global f_3_3_1_B "f_3_3_1_B_*" ; 
+all_q19_norm
 
-global f_3_3_1_C_1 " 
-all_q19_norm"; 
-
-global f_3_3_1_C_2 " 
 all_q20_norm
-all_q21_norm" ; 
+all_q21_norm
 
-global f_3_3_1_C " f_3_3_1_C_1 f_3_3_1_C_2" ; 
-
-global f_3_3_1 " f_3_3_1_A f_3_3_1_B f_3_3_1_C " ; 
-
-global f_3_3_2_1 " 
 all_q19_norm
 all_q31_norm
 all_q32_norm
-all_q14_norm" ; 
+all_q14_norm
 
-global f_3_3_2 " f_3_3_2_*" ; 
-
-global f_3_3_3 " 
 cc_q9a_norm
 cc_q11b_norm
 cc_q32j_norm
 all_q105_norm " ; 
 
-global f_3_3 " f_3_3_1 f_3_3_2 f_3_3_3  "; 
- 
 global f_3_4 "
 cc_q9c_norm 
 cc_q40a_norm 
@@ -284,61 +224,42 @@ cc_q40b_norm" ;
 
 *                                  Factor 4 ; 
 
-global f_4_1_1_A "
-cj_q12a_norm" ; 
+global f_4_1 "
+cj_q12a_norm 
 
-global f_4_1_1 "
 all_q76_norm
 lb_q16a_norm
 ph_q6a_norm
-f_4_1_1_A " ; 
 
-global f_4_1_2_A "
-cj_q12b_norm" ; 
+cj_q12b_norm
 
-global f_4_1_2 "
 all_q77_norm
 lb_q16b_norm
 ph_q6b_norm
-f_4_1_2_A " ; 
 
-global f_4_1_3_A "
-cj_q12c_norm" ; 
+cj_q12c_norm
 
-global f_4_1_3 "
 all_q78_norm
 lb_q16c_norm
 ph_q6c_norm
-f_4_1_3_A "; 
 
-global f_4_1_4_A "
-cj_q12d_norm" ; 
+cj_q12d_norm
 
-global f_4_1_4 "
 all_q79_norm
 lb_q16d_norm
 ph_q6d_norm
-f_4_1_4_A "; 
 
-global f_4_1_5_A "
-cj_q12e_norm" ; 
+cj_q12e_norm
 
-global f_4_1_5 "
 all_q80_norm
 lb_q16e_norm
 ph_q6e_norm
-f_4_1_5_A" ; 
 
-global f_4_1_6_A "
-cj_q12f_norm"; 
+cj_q12f_norm
 
-global f_4_1_6 "
 all_q81_norm
 lb_q16f_norm
-ph_q6f_norm
-f_4_1_6_A " ; 
-
-global f_4_1 "f_4_1_1 f_4_1_2 f_4_1_3 f_4_1_4 f_4_1_5 f_4_1_6 " ; 
+ph_q6f_norm" ; 
 
 global f_4_2 "
 cj_q11a_norm
@@ -348,7 +269,7 @@ cj_q42c_norm
 cj_q42d_norm
 cj_q10_norm"; 
 
-global f_4_3_1 "
+global f_4_3 "
 cj_q22d_norm
 cj_q22b_norm
 cj_q25b_norm
@@ -356,9 +277,8 @@ cj_q25c_norm
 cj_q25a_norm
 cj_q31c_norm
 cj_q31d_norm
-cj_q22e_norm" ; 
+cj_q22e_norm
 
-global f_4_3_2_1 "
 cj_q6a_norm
 cj_q6b_norm
 cj_q6c_norm
@@ -367,18 +287,15 @@ cj_q29a_norm
 cj_q29b_norm
 cj_q42c_norm
 cj_q42d_norm
-cj_q22a_norm" ; 
+cj_q22a_norm
 
-global f_4_3_2 "
-f_4_3_2_1"; 
+f_4_3_2_1
 
-global f_4_3_3 "
 cj_q1_norm
 cj_q2_norm
 cj_q11a_norm
-cj_q22c_norm"; 
+cj_q22c_norm
 
-global f_4_3_4 "
 cj_q3a_norm
 cj_q3b_norm
 cj_q3c_norm
@@ -386,16 +303,13 @@ cj_q19a_norm
 cj_q19b_norm
 cj_q19c_norm
 cj_q19e_norm
-cj_q4_norm"; 
+cj_q4_norm
 
-global f_4_3_5 "
 cj_q21a_norm
 cj_q21b_norm
 cj_q21c_norm
 cj_q21d_norm
 cj_q21f_norm"; 
-
-global f_4_3 "f_4_3_1 f_4_3_2 f_4_3_3 f_4_3_4 f_4_3_5 " ; 
 
 global f_4_4_1_A "
 all_q13_norm
