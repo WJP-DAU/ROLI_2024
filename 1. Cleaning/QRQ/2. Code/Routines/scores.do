@@ -15,6 +15,7 @@ This routine will create the factor, sub-factor and other scores using ONLY the 
 *After this point all the commmands need to finish with a  " ; "
 #delimit ;
 
+
 *                                   Factor 1 ; 
 
 egen f_1_2_A=rowmean( all_q1_norm

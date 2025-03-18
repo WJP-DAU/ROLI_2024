@@ -172,7 +172,7 @@ foreach v of varlist *_norm {
 	bys country: gen `v'_hi_p=`v'_hi_t/`v'_c
 	bys country: gen `v'_lo_p=`v'_lo_t/`v'_c
 	
-	drop `v'_max `v'_min `v'_c `v'_hi_t `v'_lo_t
+	drop `v'_max `v'_min `v'_hi_t `v'_lo_t
 }
 
 

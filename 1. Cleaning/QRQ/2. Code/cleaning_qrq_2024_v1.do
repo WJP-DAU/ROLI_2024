@@ -463,7 +463,7 @@ restore
 
 *----- Aggregate Scores - Removing sub-factor outliers + general outliers (scenario 3)
 
-*preserve
+preserve
 
 *Dropping general outliers
 drop if outlier==1 & N>20 & N_questionnaire>5
@@ -495,10 +495,9 @@ foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f
 	display as result "`v'"
 	foreach x of global `v' {
 		display as error "`x'" 
-		replace `x'=. if outlier_`v'==1 & 
+		replace `x'=. if outlier_`v'==1 & `x'_c<5
 }
 }
-
 
 
 collapse (mean) cc_q1_norm- all_q105_norm, by(country)
@@ -518,6 +517,8 @@ restore
 =================================================================================================================*/
 
 sort country question year total_score
+br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Vietnam" 
+
 
 /*
 *Afghanistan
