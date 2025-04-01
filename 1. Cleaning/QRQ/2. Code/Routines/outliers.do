@@ -113,6 +113,9 @@ f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8
 	replace outlier_`v'=1 if `v'>=(`v'_mean+2.5*`v'_sd) & `v'~=. ;
 	replace outlier_`v'=1 if `v'<=(`v'_mean-2.5*`v'_sd) & `v'~=. ;
 	
+	bysort country: egen `v'_max=max(`v') ;
+	bysort country: egen `v'_min=min(`v') ;
+	
 	drop `v'_mean `v'_sd ;
 };
 #delimit cr
@@ -149,7 +152,8 @@ f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8
 *--      By question       --*
 *                            *
 
-foreach v of varlist *_norm {
+foreach v in $norm {
+	display as result "`v'"
 	bysort country: egen `v'_max=max(`v')
 	bysort country: egen `v'_min=min(`v')
 	
@@ -174,14 +178,6 @@ foreach v of varlist *_norm {
 	
 	drop `v'_max `v'_min `v'_hi_t `v'_lo_t
 }
-
-
-
-/*
-bys country: egen all_q4_norm_c=count(all_q4_norm)
-bys country: egen all_q4_norm_t=total(outlier_hi_all_q4_norm)
-bys country: gen all_q4_norm_p=all_q4_norm_t/all_q4_norm_c
-*/
 
 
 

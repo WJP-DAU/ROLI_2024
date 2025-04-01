@@ -14,6 +14,7 @@ This do file takes the calculations from 2024 and develops new calculations for 
 
 clear
 cls
+set maxvar 120000
 
 
 /*=================================================================================================================
@@ -22,7 +23,7 @@ cls
 
 
 *--- Stata Version
-version 15
+*version 15
 
 *--- Required packages:
 * NONE
@@ -428,7 +429,10 @@ bysort country: gen N=_N
 *Total number of experts by country and discipline
 bysort country question: gen N_questionnaire=_N
 
+*Define global for norm variables
+qui do "${path2dos}\Routines\globals.do"
 
+*Outliers routine 
 qui do "${path2dos}\Routines\outliers.do"
 
 
@@ -436,11 +440,16 @@ qui do "${path2dos}\Routines\outliers.do"
 
 preserve
 
-collapse (mean) cc_q1_norm- all_q105_norm, by(country)
+collapse (mean) $norm (sum) count_cc count_cj count_lb count_ph, by(country)
 
-do "${path2dos}\Routines\scores.do"
+qui do "${path2dos}\Routines\scores.do"
 
 save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+
+keep country count_cc count_cj count_lb count_ph
+egen total_counts=rowtotal(count_cc count_cj count_lb count_ph)
+
+save "$path2data\2. Scenarios\country_counts.dta", replace
 
 restore
 
@@ -452,9 +461,9 @@ preserve
 *Dropping general outliers
 drop if outlier==1 & N>20 & N_questionnaire>5
 
-collapse (mean) cc_q1_norm- all_q105_norm, by(country)
+collapse (mean) $norm, by(country)
 
-do "${path2dos}\Routines\scores.do"
+qui do "${path2dos}\Routines\scores.do"
 
 save "$path2data\2. Scenarios\qrq_country_averages_s2.dta", replace
 
@@ -468,48 +477,74 @@ preserve
 *Dropping general outliers
 drop if outlier==1 & N>20 & N_questionnaire>5
 
-*Dropping questions in sub-factor for experts that are outliers in that indicator
+*Dropping ALL questions in sub-factor for experts that are outliers in that indicator
 do "${path2dos}\Routines\subfactor_questions.do"
-
-/*
-#delimit ;
-foreach v in 
-f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 
-f_2_1 f_2_2 f_2_3 f_2_4
-f_3_1 f_3_2 f_3_3 f_3_4
-f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8
-f_5_3
-f_6_1 f_6_2 f_6_3 f_6_4 f_6_5
-f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7
-f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
-f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 
-{;
-	foreach x of global ``v'' { ;
-		replace ``x''=. if outlier_`v'==1 ;	
-};
-};
-#delimit cr
-*/
 
 foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
 	display as result "`v'"
 	foreach x of global `v' {
 		display as error "`x'" 
-		replace `x'=. if outlier_`v'==1 & `x'_c<5
+		replace `x'=. if outlier_`v'==1 & `x'_c>5
 }
 }
 
+collapse (mean) $norm, by(country)
 
-collapse (mean) cc_q1_norm- all_q105_norm, by(country)
-
-do "${path2dos}\Routines\scores.do"
+qui do "${path2dos}\Routines\scores.do"
 
 save "$path2data\2. Scenarios\qrq_country_averages_s3.dta", replace
 
 restore
 
 
+*----- Aggregate Scores - Removing question outliers + general outliers (scenario 4)
 
+preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Dropping questions that are outliers (max-min values with a proportion of less than 15%)
+foreach v in $norm {
+	display as result "`v'"
+	replace `v'=. if `v'_hi_p<0.15 & `v'_c>5 & `v'!=.
+	replace `v'=. if `v'_lo_p<0.15 & `v'_c>5 & `v'!=. 
+}
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s4.dta", replace
+
+restore
+
+
+*----- Aggregate Scores - Removing question outliers + general outliers (scenario 5) SECOND VERSION
+
+preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
+	display as result "`v'"
+	foreach x of global `v' {
+		display as error "`x'" 
+		replace `x'=. if `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & `v'_max==`v'
+		replace `x'=. if `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & `v'_min==`v'
+		
+}
+}
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s5.dta", replace
+
+restore
 
 
 /*=================================================================================================================
@@ -517,10 +552,11 @@ restore
 =================================================================================================================*/
 
 sort country question year total_score
-br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Vietnam" 
-
+br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Afghanistan" 
 
 /*
+
+
 *Afghanistan
 drop if id_alex=="cc_English_1_1104" //Afghanistan
 drop if id_alex=="cj_English_1_136" //Afghanistan
