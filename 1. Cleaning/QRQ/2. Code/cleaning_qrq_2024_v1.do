@@ -418,7 +418,7 @@ drop if tail_ph==1 & ph_total_new>=15
 
 
 drop N N_questionnaire
-
+ 
 ********************************************************
 				 /* 6. Outliers */
 ********************************************************
@@ -436,7 +436,7 @@ qui do "${path2dos}\Routines\globals.do"
 qui do "${path2dos}\Routines\outliers.do"
 
 
-*----- Aggregate Scores - NO DELETIONS (scenario 1)
+*----- Aggregate Scores - NO DELETIONS (scenario 0)
 
 preserve
 
@@ -444,17 +444,17 @@ collapse (mean) $norm (sum) count_cc count_cj count_lb count_ph, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+save "$path2data\2. Scenarios\qrq_country_averages_s0.dta", replace
 
 keep country count_cc count_cj count_lb count_ph
 egen total_counts=rowtotal(count_cc count_cj count_lb count_ph)
 
-save "$path2data\2. Scenarios\country_counts.dta", replace
+save "$path2data\2. Scenarios\country_counts_s0.dta", replace
 
 restore
 
 
-*----- Aggregate Scores - Removing general outliers (scenario 2)
+*----- Aggregate Scores - Removing general outliers (scenario 1)
 
 preserve
 
@@ -465,9 +465,30 @@ collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\qrq_country_averages_s2.dta", replace
+save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
 
 restore
+
+
+*----- Aggregate Scores - Removing sub-factor outliers + general outliers + outliers by discipline (scenario 2)
+
+preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Dropping 
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+
+restore
+
+
+
 
 
 *----- Aggregate Scores - Removing sub-factor outliers + general outliers (scenario 3)
@@ -551,7 +572,7 @@ restore
 					VII. Adjustments
 =================================================================================================================*/
 
-sort country question year total_score
+sort country question total_score
 br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f_6 f_7 f_8  if country=="Afghanistan" 
 
 /*
