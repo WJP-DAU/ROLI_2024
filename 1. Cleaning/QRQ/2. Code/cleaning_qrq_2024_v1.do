@@ -7343,7 +7343,8 @@ br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f
 drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
-save "$path2data\qrq.dta", replace
+
+*save "$path2data\3. Final\qrq.dta", replace
 
 
 /*=================================================================================================================
@@ -7438,7 +7439,7 @@ drop total_score- total_score_mean
 *order WJP_password cc_q6a_usd cc_q6a_gni, last
 order WJP_password, last
 drop WJP_password
-save "$path2data\qrq_country_averages.dta", replace
+*save "$path2data\3. Final\qrq_country_averages.dta", replace
 
 br
 

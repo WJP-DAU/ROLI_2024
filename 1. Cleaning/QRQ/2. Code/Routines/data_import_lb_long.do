@@ -24,7 +24,7 @@ according to the QRQ datamap.
 
 **** LONGITUDINAL ****
 
-import excel "$path2data\LB Long 2024", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\LB Long 2024", sheet("Worksheet") firstrow clear
 
 gen longitudinal=1
 gen question="lb"
@@ -275,7 +275,7 @@ replace country="Turkiye" if country=="Turkey"
 
 /* Save final dataset */
 
-save "$path2exp\Long\lb_final_long_2023.dta", replace
+save "$path2data\1. Original\lb_final_long_2023.dta", replace
 
 
 

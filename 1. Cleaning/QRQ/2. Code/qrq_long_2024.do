@@ -1,5 +1,5 @@
 /*=================================================================================================================
-Project:		QRQ 2024 - long
+Project:		QRQ LONG
 Routine:		QRQ Data Cleaning and Harmonization 2024 (master do file) - long
 Author(s):		Natalia Rodriguez (nrodriguez@worldjusticeproject.org)
 Dependencies:  	World Justice Project
@@ -28,9 +28,8 @@ version 15
 
 *------ (a) Natalia Rodriguez:
 if (inlist("`c(username)'", "nrodriguez")) {
-	global path2data "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\QRQ\QRQ 2024\Final Data\excel"
-	global path2exp "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Index Data & Analysis\2024\QRQ"
-	global path2dos  "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\QRQ do files\2024"
+	global path2SP "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Data Analytics\7. WJP ROLI\ROLI_2024\1. Cleaning\QRQ"
+	global path2GH "C:\Users\nrodriguez\OneDrive - World Justice Project\Natalia\GitHub\ROLI_2024\1. Cleaning\QRQ"
 }
 
 *------ (b) Alex Ponce:
@@ -39,18 +38,15 @@ else if (inlist("`c(username)'", "")) {
 	global path2GH ""
 }
 
-/**--- Defining path to Data and DoFiles:
+*--- Defining path to Data and DoFiles:
 
 **Path2data: Path to original exports from Alchemer by QRQ team. 
-For Natalia: QRQ folder (Sharepoint)
+global path2data "${path2SP}\1. Data"
 
 **Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
-For Natalia: Index Data & Analysis (Sharepoint)
 
 **Path 2dos: Path to do-files (Routines). 
-For Natalia: QRQ do files folder (Sharepoint)
-
-*/
+global path2dos  "${path2GH}\2. Code"
 
 /*=================================================================================================================
 					I. Cleaning the data
@@ -90,12 +86,12 @@ do "${path2dos}/Routines/data_import_ph_long.do"
 =================================================================================================================*/
 
 clear
-use "$path2exp\Long\cc_final_long_2023.dta"
-append using "$path2exp\Long\cj_final_long_2023.dta"
-append using "$path2exp\Long\lb_final_long_2023.dta"
-append using "$path2exp\Long\ph_final_long_2023.dta"
+use "$path2data\1. Original\cc_final_long_2023.dta"
+append using "$path2data\1. Original\cj_final_long_2023.dta"
+append using "$path2data\1. Original\lb_final_long_2023.dta"
+append using "$path2data\1. Original\ph_final_long_2023.dta"
 
-save "$path2exp\Long\qrq_long_2023.dta", replace
+save "$path2data\1. Original\qrq_long_2023.dta", replace
 
 
 /*=================================================================================================================
@@ -113,7 +109,7 @@ do "${path2dos}/Routines/common_q.do"
 
 sort country question id_alex
 
-save "$path2exp\Long\qrq_long_2023.dta", replace
+save "$path2data\1. Original\qrq_long_2023.dta", replace
 
 
 /*=================================================================================================================
@@ -203,7 +199,7 @@ sort country id_alex
 
 do "${path2dos}/Routines/scores.do"
 
-save "$path2exp\Long\qrq_long_2023.dta", replace
+save "$path2data\1. Original\qrq_long_2023.dta", replace
 
 
 /*=================================================================================================================
@@ -217,19 +213,19 @@ When we do the merge, it wrongly keeps the questionnaire droppped from 2024, as 
 
 *Save loggins from 2023
 
-use "$path2exp\Long\qrq_long_2023.dta", clear
+use "$path2data\1. Original\qrq_long_2023.dta", clear
 keep WJP_password question
 sort WJP_password
-save "$path2exp\Long\qrq_login_long_2023.dta", replace
+save "$path2data\1. Original\qrq_login_long_2023.dta", replace
 
 /* Open this year's dataset (2024) and merge the loggings from 2023. We are keeping only the ones that matched. 
 There could be ones that didn't match because we deleted them from the 2024 dataset (outliers) and from older years.
 With this, we will keep the longitudinal experts from 2024 that are valid (that haven't been removed in 2024). 
 2023 login long has all the 2023 qrq long experts. It will be removing the regular from 2024 and from previous years */
 
-use "$path2exp\qrq.dta", clear
+use "$path2data\1. Original\qrq.dta", clear
 sort WJP_password
-merge m:m WJP_password question using "$path2exp\Long\qrq_login_long_2023.dta"
+merge m:m WJP_password question using "$path2data\1. Original\qrq_login_long_2023.dta"
 keep if _merge==3
 drop _merge
 
@@ -237,25 +233,25 @@ drop _merge
 tab year
 count
 
-save "$path2exp\Long\qrq_long_2024.dta", replace
+save "$path2data\1. Original\qrq_long_2024.dta", replace
 
 keep WJP_password question
 sort WJP_password
-save "$path2exp\Long\qrq_login_long_2024.dta", replace
+save "$path2data\1. Original\qrq_login_long_2024.dta", replace
 
 *Open the 2023 and merge the loggings that match from 2024.
 
-use "$path2exp\Long\qrq_long_2023.dta", clear
+use "$path2data\1. Original\qrq_long_2023.dta", clear
 sort WJP_password
-merge m:m WJP_password question using "$path2exp\Long\qrq_login_long_2024.dta"
+merge m:m WJP_password question using "$path2data\1. Original\qrq_login_long_2024.dta"
 keep if _merge==3
 drop _merge
 
-save "$path2exp\Long\qrq_long_2023.dta", replace
+save "$path2data\1. Original\qrq_long_2023.dta", replace
 
 count
-erase "$path2exp\Long\qrq_login_long_2023.dta"
-erase "$path2exp\Long\qrq_login_long_2024.dta"
+erase "$path2data\1. Original\qrq_login_long_2023.dta"
+erase "$path2data\1. Original\qrq_login_long_2024.dta"
 
 /*=================================================================================================================
 					VII. Country Agerages
@@ -265,7 +261,7 @@ erase "$path2exp\Long\qrq_login_long_2024.dta"
 /* Country Averages (2023) */
 /*-------------------------*/
 
-use "$path2exp\Long\qrq_long_2023.dta", clear
+use "$path2data\1. Original\qrq_long_2023.dta", clear
 
 foreach var of varlist cc_q1_norm- all_q105_norm {
 	bysort country: egen CO_`var'=mean(`var')
@@ -288,14 +284,14 @@ sort country
 
 sort country
 
-save "$path2exp\Long\qrq_long_2023_country_averages.dta", replace
+save "$path2data\3. Final\qrq_long_2023_country_averages.dta", replace
 
 
 /*-------------------------*/
 /* Country Averages (2024) */
 /*-------------------------*/
 
-use "$path2exp\Long\qrq_long_2024.dta", clear
+use "$path2data\1. Original\qrq_long_2024.dta", clear
 
 foreach var of varlist cc_q1_norm- all_q105_norm {
 	bysort country: egen CO_`var'=mean(`var')
@@ -310,8 +306,8 @@ drop tag
 
 drop question-language
 *drop WJP_login WJP_password cc_q6a_usd cc_q6a_gni
-drop WJP_login WJP_password 
-drop total_score-total_score_mean
+*drop WJP_login WJP_password 
+*drop total_score-total_score_mean
 
 sort country
 
@@ -321,14 +317,14 @@ sort country
 
 sort country
 
-save "$path2exp\Long\qrq_long_2024_country_averages.dta", replace
+save "$path2data\3. Final\qrq_long_2024_country_averages.dta", replace
 
 
 /*=================================================================================================================
 					VIII. Number of longitudinal questionnaires
 =================================================================================================================*/
 
-use "$path2exp\Long\qrq_long_2023.dta", clear
+use "$path2data\1. Original\qrq_long_2023.dta", clear
 
 count
 
