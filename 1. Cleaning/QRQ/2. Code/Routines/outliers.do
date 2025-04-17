@@ -118,9 +118,11 @@ f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8
 	bysort country: egen `v'_mean=mean(`v') ;
 	bysort country: egen `v'_sd=sd(`v') ;
 
-	g outlier_`v'=0 ;
-	replace outlier_`v'=1 if `v'>=(`v'_mean+2.5*`v'_sd) & `v'~=. ;
-	replace outlier_`v'=1 if `v'<=(`v'_mean-2.5*`v'_sd) & `v'~=. ;
+	g outlier_`v'_hi=0 ;
+	replace outlier_`v'_hi=1 if `v'>=(`v'_mean+2.5*`v'_sd) & `v'~=. ;
+	
+	g outlier_`v'_lo=0 ;
+	replace outlier_`v'_lo=1 if `v'<=(`v'_mean-2.5*`v'_sd) & `v'~=. ;
 	
 	*Min-max values for factor-sub-factor
 	bysort country: egen `v'_max=max(`v') ;
@@ -193,6 +195,6 @@ foreach v in $norm {
 	bys country: gen `v'_hi_p=`v'_hi_t/`v'_c
 	bys country: gen `v'_lo_p=`v'_lo_t/`v'_c
 	
-	drop `v'_max `v'_min `v'_hi_t `v'_lo_t
+	*drop `v'_max `v'_min `v'_hi_t `v'_lo_t
 }
 

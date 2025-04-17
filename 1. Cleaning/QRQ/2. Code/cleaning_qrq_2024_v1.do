@@ -470,26 +470,31 @@ save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
 restore
 
 
-*----- Aggregate Scores - Removing sub-factor outliers + general outliers + outliers by discipline (scenario 2)
+*----- Aggregate Scores - Removing question outliers + general outliers (scenario 2) SECOND VERSION
 
 preserve
 
 *Dropping general outliers
 drop if outlier==1 & N>20 & N_questionnaire>5
 
-*Dropping 
+*Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
+	display as result "`v'"
+	foreach x of global `v' {
+		display as error "`x'" 
+		replace `x'=. if `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & `v'_max==`v'
+		replace `x'=. if `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & `v'_min==`v'
+		
+}
+}
 
 collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+save "$path2data\2. Scenarios\qrq_country_averages_s5.dta", replace
 
 restore
-
-
-
-
 
 *----- Aggregate Scores - Removing sub-factor outliers + general outliers (scenario 3)
 
@@ -518,7 +523,29 @@ save "$path2data\2. Scenarios\qrq_country_averages_s3.dta", replace
 restore
 
 
-*----- Aggregate Scores - Removing question outliers + general outliers (scenario 4)
+/*
+*----- Aggregate Scores - Removing sub-factor outliers + general outliers + outliers by discipline (scenario 2)
+
+preserve
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Dropping 
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s1.dta", replace
+
+restore
+
+*/
+
+
+/*
+*----- Aggregate Scores - Removing question outliers + general outliers (scenario 3)
 
 preserve
 
@@ -539,33 +566,7 @@ qui do "${path2dos}\Routines\scores.do"
 save "$path2data\2. Scenarios\qrq_country_averages_s4.dta", replace
 
 restore
-
-
-*----- Aggregate Scores - Removing question outliers + general outliers (scenario 5) SECOND VERSION
-
-preserve
-
-*Dropping general outliers
-drop if outlier==1 & N>20 & N_questionnaire>5
-
-*Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
-	display as result "`v'"
-	foreach x of global `v' {
-		display as error "`x'" 
-		replace `x'=. if `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & `v'_max==`v'
-		replace `x'=. if `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & `v'_min==`v'
-		
-}
-}
-
-collapse (mean) $norm, by(country)
-
-qui do "${path2dos}\Routines\scores.do"
-
-save "$path2data\2. Scenarios\qrq_country_averages_s5.dta", replace
-
-restore
+*/
 
 
 /*=================================================================================================================
