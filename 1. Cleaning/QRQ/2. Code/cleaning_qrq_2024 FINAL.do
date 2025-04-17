@@ -436,6 +436,10 @@ drop if tail_ph==1 & ph_total_new>=15
 					VII. Adjustments
 =================================================================================================================*/
 
+*Saving dataset BEFORE ADJUSTMENTS
+save "$path2data\1. Original\qrq_pre_adj.dta", replace
+
+
 sort country question year total_score
 
 
@@ -7200,6 +7204,7 @@ br question year country longitudinal id_alex total_score ROLI f_1 f_2 f_3 f_4 f
 drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
+*Saving FINAL dataset AFTER adjusments
 save "$path2data\3. Final\qrq.dta", replace
 
 

@@ -219,9 +219,9 @@ sort WJP_password
 save "$path2data\1. Original\qrq_login_long_2023.dta", replace
 
 /* Open this year's dataset (2024) and merge the loggings from 2023. We are keeping only the ones that matched. 
-There could be ones that didn't match because we deleted them from the 2024 dataset (outliers) and from older years.
-With this, we will keep the longitudinal experts from 2024 that are valid (that haven't been removed in 2024). 
-2023 login long has all the 2023 qrq long experts. It will be removing the regular from 2024 and from previous years */
+- There could be ones that didn't match because we deleted them from the 2024 dataset (outliers) and from older years.
+- With this, we will keep the longitudinal experts from 2024 that are valid (that haven't been removed in 2024). 
+- 2023 login long has all the 2023 qrq long experts. It will be removing the regular from 2024 and from previous years */
 
 use "$path2data\1. Original\qrq.dta", clear
 sort WJP_password
@@ -341,4 +341,13 @@ egen tag = tag(country)
 
 sort country
 br country cc_total cj_total lb_total ph_total if tag==1
+
+
+/*=================================================================================================================
+					IX. Changes over time (LONG)
+=================================================================================================================*/
+
+
+
+
 
