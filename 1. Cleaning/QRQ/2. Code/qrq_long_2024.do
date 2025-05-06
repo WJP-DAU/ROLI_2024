@@ -284,6 +284,24 @@ sort country
 
 sort country
 
+*Creating ROLI scores with only QRQ data
+do "${path2dos}/Routines/scores.do"
+
+keep country f_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 ///
+f_2 f_2_1 f_2_2 f_2_3 f_2_4 ///
+f_3 f_3_1 f_3_2 f_3_3 f_3_4 ///
+f_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 ///
+f_5 f_5_3 ///
+f_6 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 ///
+f_7 f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7 ///
+f_8 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 ///
+f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL 
+
+*Renaming 2024 scores
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+	rename `v' `v'_2023
+}
+
 save "$path2data\3. Final\qrq_long_2023_country_averages.dta", replace
 
 
@@ -317,6 +335,24 @@ sort country
 
 sort country
 
+*Creating ROLI scores with only QRQ data
+do "${path2dos}/Routines/scores.do"
+
+keep country f_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 ///
+f_2 f_2_1 f_2_2 f_2_3 f_2_4 ///
+f_3 f_3_1 f_3_2 f_3_3 f_3_4 ///
+f_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 ///
+f_5 f_5_3 ///
+f_6 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 ///
+f_7 f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7 ///
+f_8 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 ///
+f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL 
+
+*Renaming 2024 scores
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+	rename `v' `v'_2024
+}
+
 save "$path2data\3. Final\qrq_long_2024_country_averages.dta", replace
 
 
@@ -340,12 +376,51 @@ bysort country: egen ph_total=total(aux4)
 egen tag = tag(country)
 
 sort country
-br country cc_total cj_total lb_total ph_total if tag==1
+*br country cc_total cj_total lb_total ph_total if tag==1
 
 
 /*=================================================================================================================
 					IX. Changes over time (LONG)
 =================================================================================================================*/
+
+use "$path2data\3. Final\qrq_long_2024_country_averages.dta", replace
+
+*Merging 2023 scores
+
+merge 1:1 country using "$path2data\3. Final\qrq_long_2023_country_averages.dta"
+drop _merge
+
+*Calculating changes over time
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+	g double dif_`v'=(`v'_2024-`v'_2023)
+	g double growth_`v'=(`v'_2024-`v'_2023)/`v'_2023
+}
+
+keep country dif_* growth_*
+
+save "$path2data\3. Final\qrq_long_changes_over_time.dta", replace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -48,9 +48,20 @@ replace outlier_iqr=1 if total_score<=(total_score_q1-1.5*total_score_iqr) & tot
 bysort country question: egen total_score_mean_qrq=mean(total_score)
 bysort country question: egen total_score_sd_qrq=sd(total_score)
 
-gen outlier_qrq=0
-replace outlier_qrq=1 if total_score>=(total_score_mean_qrq+2.5*total_score_sd_qrq) & total_score~=.
-replace outlier_qrq=1 if total_score<=(total_score_mean_qrq-2.5*total_score_sd_qrq) & total_score~=.
+foreach x in cc cj lb ph {
+	gen outlier_`x'_lo=0
+	replace outlier_`x'_lo=1 if total_score<=(total_score_mean_qrq-2.5*total_score_sd_qrq) & total_score~=. & question=="`x'"
+	
+	gen outlier_`x'_hi=0
+	replace outlier_`x'_hi=1 if total_score>=(total_score_mean_qrq+2.5*total_score_sd_qrq) & total_score~=. & question=="`x'"
+}
+
+/*
+gen outlier_qrq_hi=0
+replace outlier_qrq_hi=1 if total_score>=(total_score_mean_qrq+2.5*total_score_sd_qrq) & total_score~=.
+
+gen outlier_qrq_lo=0
+replace outlier_qrq_lo=1 if total_score<=(total_score_mean_qrq-2.5*total_score_sd_qrq) & total_score~=.
 
 
 ****** IQR 
@@ -62,7 +73,7 @@ bysort country question: egen total_score_qrq_q3=pctile(total_score), p(75)
 gen outlier_qrq_iqr=0
 replace outlier_qrq_iqr=1 if total_score>=(total_score_qrq_q3+1.5*total_score_qrq_iqr) & total_score~=.
 replace outlier_qrq_iqr=1 if total_score<=(total_score_qrq_q1-1.5*total_score_qrq_iqr) & total_score~=.
-
+*/
 
 ****** Min-max values
 
