@@ -43,14 +43,17 @@ if (inlist("`c(username)'", "nrodriguez")) {
 
 *--- Defining path to Data and DoFiles:
 
-**Path2data: Path to original exports from Alchemer by QRQ team. 
+*Path2data: Path to original exports from Alchemer by QRQ team. 
 global path2data "${path2SP}\1. Data"
 
-**Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
+*Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
 
-**Path 2dos: Path to do-files (Routines). 
+*Path 2dos: Path to do-files (Routines). 
 global path2dos  "${path2GH}\2. Code"
 
+*Years of analysis
+global year_current "2024"
+global year_previous "2023"
 
 
 /*=================================================================================================================
@@ -96,7 +99,7 @@ append using "${path2data}\1. Original\cj_final.dta"
 append using "${path2data}\1. Original\lb_final.dta"
 append using "${path2data}\1. Original\ph_final.dta"
 
-save "${path2data}\1. Original\qrq.dta", replace
+save "${path2data}\1. Original\qrq_${year_current}.dta", replace
 
 
 /*=================================================================================================================
@@ -114,7 +117,7 @@ do "${path2dos}/Routines/common_q.do"
 
 sort country question id_alex
 
-save "$path2data\1. Original\qrq.dta", replace
+save "$path2data\1. Original\qrq_${year_current}.dta", replace
 
 
 /*=================================================================================================================
@@ -123,37 +126,37 @@ save "$path2data\1. Original\qrq.dta", replace
 
 /* Responded in 2023 */
 clear
-use "$path2data\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_${year_previous}.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2data\1. Original\qrq_2023_login.dta", replace
+save "$path2data\1. Original\qrq_${year_previous}_login.dta", replace
 
 
 /* Responded longitudinal survey in 2024 */ 
 clear
-use "$path2data\1. Original\qrq.dta"
+use "$path2data\1. Original\qrq_${year_current}.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2data\1. Original\qrq_login.dta", replace 
+save "$path2data\1. Original\qrq_${year_current}_login.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Login) */
 clear
-use "$path2data\1. Original\qrq_2023_login.dta"
-merge 1:1 WJP_password using "$path2data\1. Original\qrq_login.dta"
+use "$path2data\1. Original\qrq_${year_previous}_login.dta"
+merge 1:1 WJP_password using "$path2data\1. Original\qrq_${year_current}_login.dta"
 keep if _merge==1
 drop _merge
 sort WJP_password
-save "$path2data\1. Original\qrq_2023_login_unique.dta", replace 
+save "$path2data\1. Original\qrq_${year_previous}_login_unique.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Full data) */
 clear
-use "$path2data\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_${year_previous}.dta"
 sort WJP_password
-merge m:1 WJP_password using "$path2data\1. Original\qrq_2023_login_unique.dta"
+merge m:1 WJP_password using "$path2data\1. Original\qrq_${year_previous}_login_unique.dta"
 
 replace _merge=3 if id_alex=="lb_English_1_28_2021_2022" // LB Gambia expert that answered CC in 2023 but not LB (old LB answer from 2021) DO NOT DELETE NEXT YEAR!!!!!!!!!!!!!!!!!!!!!!!!!!! CHECK IT!!!!!!
 replace _merge=3 if id_alex=="lb_English_0_587_2022" //LB Grenada that switched disciplines over years and are long CCs. DO NOT DELETE NEXT YEAR!!!!!!!!
@@ -164,29 +167,29 @@ replace _merge=3 if id_alex=="lb_French_1_470" //LB Guinea old, CJ AND CJ long 2
 
 keep if _merge==3
 drop _merge
-gen aux="2023"
+gen aux="${year_previous}"
 egen id_alex_1=concat(id_alex aux), punct(_)
 replace id_alex=id_alex_1
 drop id_alex_1 aux
 sort WJP_password
-save "$path2data\1. Original\qrq_2023.dta", replace
+save "$path2data\1. Original\qrq_${year_previous}.dta", replace
 
-erase "$path2data\1. Original\qrq_2023_login.dta"
-erase "$path2data\1. Original\qrq_login.dta"
-erase "$path2data\1. Original\qrq_2023_login_unique.dta"
+erase "$path2data\1. Original\qrq_${year_previous}_login.dta"
+erase "$path2data\1. Original\qrq_${year_current}_login.dta"
+erase "$path2data\1. Original\qrq_${year_previous}_login_unique.dta"
 
 
 /* Merging with 2023 data and older regular data*/
 clear
-use "$path2data\1. Original\qrq.dta"
-append using "$path2data\1. Original\qrq_2023.dta"
+use "$path2data\1. Original\qrq_${year_current}.dta"
+append using "$path2data\1. Original\qrq_${year_previous}.dta"
 
 *Dropping total scores from previous years
 drop total_score total_n f_1* f_2* f_3* f_4* f_6* f_7* f_8* N total_score_mean total_score_sd outlier outlier_CO
 
 *Observations are no longer longitudinal because the database we're appending only includes people that only answered in 2023 or before
 tab year longitudinal
-replace longitudinal=0 if year==2023
+replace longitudinal=0 if year==${year_previous}
 tab year longitudinal
 
 
@@ -429,6 +432,10 @@ bysort country: gen N=_N
 *Total number of experts by country and discipline
 bysort country question: gen N_questionnaire=_N
 
+*Average score and standard deviation (for outliers)
+bysort country: egen total_score_mean=mean(total_score)
+bysort country: egen total_score_sd=sd(total_score)
+
 *Define global for norm variables
 qui do "${path2dos}\Routines\globals.do"
 
@@ -592,6 +599,82 @@ save "$path2data\2. Scenarios\qrq_country_averages_s3_n.dta", replace
 restore
 
 
+*----- Aggregate Scores - Removing question outliers + general outliers + discipline outliers (scenario 3) ALTERNATIVE
+
+
+***** POSITIVE OUTLIERS
+preserve
+
+*Outliers routine (scenario 1)
+qui do "${path2dos}\Routines\outliers_gen.do"
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Outliers routine (scenario 3) - This routine defines the outliers by question
+qui do "${path2dos}\Routines\outliers_ques.do"
+
+*This routine defines the globals for each sub-factor (all questions included in the sub-factor)
+qui do "${path2dos}\Routines\subfactor_questions.do"
+
+*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+qui do "${path2dos}\Routines\outliers_sub.do"
+
+*Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
+	display as result "`v'"
+	foreach x of global `v' {
+		display as error "`x'" 
+		replace `x'=. if `x'==`x'_max & `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1		
+}
+}
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s3_p_alt.dta", replace
+
+restore
+
+
+***** NEGATIVE OUTLIERS
+preserve
+
+*Outliers routine (scenario 1)
+qui do "${path2dos}\Routines\outliers_gen.do"
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Outliers routine (scenario 3) - This routine defines the outliers by question
+qui do "${path2dos}\Routines\outliers_ques.do"
+
+*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+qui do "${path2dos}\Routines\outliers_sub.do"
+
+*This routine defines the globals for each sub-factor (all questions included in the sub-factor)
+qui do "${path2dos}\Routines\subfactor_questions.do"
+
+*Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 {
+	display as result "`v'"
+	foreach x of global `v' {
+		display as error "`x'" 		
+		replace `x'=. if `x'==`x'_min & `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1
+		
+}
+}
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s3_n_alt.dta", replace
+
+restore
+
+
 *----- Aggregate Scores - Removing sub-factor outliers + general outliers + discipline outliers (scenario 4)
 
 
@@ -707,6 +790,101 @@ save "$path2data\2. Scenarios\qrq_country_averages_s4_n.dta", replace
 restore
 
 
+*----- Aggregate Scores - Removing sub-factor outliers + general outliers + discipline outliers (scenario 4) ALTERNATIVE
+
+
+***** POSITIVE OUTLIERS
+preserve
+
+*Outliers routine (scenario 1)
+qui do "${path2dos}\Routines\outliers_gen.do"
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Outliers routine (scenario 3) - This routine defines the outliers by question
+qui do "${path2dos}\Routines\outliers_ques.do"
+
+*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+qui do "${path2dos}\Routines\outliers_sub.do"
+
+*This routine defines the globals for each sub-factor (all questions included in the sub-factor)
+qui do "${path2dos}\Routines\subfactor_questions.do"
+
+*Dropping ALL questions in sub-factor if the expert is an outlier for this indicator
+#delimit ;
+foreach v in 
+f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 
+f_2_1 f_2_2 f_2_3 f_2_4
+f_3_1 f_3_2 f_3_3 f_3_4
+f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8
+f_5_3
+f_6_1 f_6_2 f_6_3 f_6_4 f_6_5
+f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7
+f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
+{;
+	display as result "`v'"	;
+	foreach x of global `v' {;
+		display as error "`x'" ;
+		replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1 ;	
+};
+};
+#delimit cr
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s4_p_alt.dta", replace
+
+restore
+
+
+***** NEGATIVE OUTLIERS
+preserve
+
+*Outliers routine (scenario 1)
+qui do "${path2dos}\Routines\outliers_gen.do"
+
+*Dropping general outliers
+drop if outlier==1 & N>20 & N_questionnaire>5
+
+*Outliers routine (scenario 3) - This routine defines the outliers by question
+qui do "${path2dos}\Routines\outliers_ques.do"
+
+*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+qui do "${path2dos}\Routines\outliers_sub.do"
+
+*This routine defines the globals for each sub-factor (all questions included in the sub-factor)
+qui do "${path2dos}\Routines\subfactor_questions.do"
+
+*Dropping ALL questions in sub-factor if the expert is an outlier for this indicator
+#delimit ;
+foreach v in 
+f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 
+f_2_1 f_2_2 f_2_3 f_2_4
+f_3_1 f_3_2 f_3_3 f_3_4
+f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8
+f_5_3
+f_6_1 f_6_2 f_6_3 f_6_4 f_6_5
+f_7_1 f_7_2 f_7_3  f_7_4 f_7_5 f_7_6 f_7_7
+f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
+{;
+	display as result "`v'"	;
+	foreach x of global `v' {;
+		display as error "`x'" ;
+		replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1 ;	
+};
+};
+#delimit cr
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\qrq_country_averages_s4_n_alt.dta", replace
+
+restore
 
 
 /*
@@ -7523,7 +7701,7 @@ drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
 
-*save "$path2data\3. Final\qrq.dta", replace
+*save "$path2data\3. Final\qrq_{$year_current}.dta", replace
 
 
 /*=================================================================================================================

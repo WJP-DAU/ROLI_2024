@@ -41,14 +41,17 @@ if (inlist("`c(username)'", "nrodriguez")) {
 
 *--- Defining path to Data and DoFiles:
 
-**Path2data: Path to original exports from Alchemer by QRQ team. 
+*Path2data: Path to original exports from Alchemer by QRQ team. 
 global path2data "${path2SP}\1. Data"
 
-**Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
+*Path2exp: Path to folder with final datasets (QRQ.dta and qrq_country_averages.dta". 
 
-**Path 2dos: Path to do-files (Routines). 
+*Path 2dos: Path to do-files (Routines). 
 global path2dos  "${path2GH}\2. Code"
 
+*Years of analysis
+global year_current "2024"
+global year_previous "2023"
 
 
 /*=================================================================================================================
@@ -94,7 +97,7 @@ append using "${path2data}\1. Original\cj_final.dta"
 append using "${path2data}\1. Original\lb_final.dta"
 append using "${path2data}\1. Original\ph_final.dta"
 
-save "${path2data}\1. Original\qrq.dta", replace
+save "${path2data}\1. Original\qrq_${year_current}.dta", replace
 
 
 /*=================================================================================================================
@@ -112,7 +115,7 @@ do "${path2dos}/Routines/common_q.do"
 
 sort country question id_alex
 
-save "$path2data\1. Original\qrq.dta", replace
+save "${path2data}\1. Original\qrq_${year_current}.dta", replace
 
 
 /*=================================================================================================================
@@ -121,37 +124,37 @@ save "$path2data\1. Original\qrq.dta", replace
 
 /* Responded in 2023 */
 clear
-use "$path2data\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_${year_previous}.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2data\1. Original\qrq_2023_login.dta", replace
+save "$path2data\1. Original\qrq_${year_previous}_login.dta", replace
 
 
 /* Responded longitudinal survey in 2024 */ 
 clear
-use "$path2data\1. Original\qrq.dta"
+use "$path2data\1. Original\qrq_${year_current}.dta"
 keep WJP_password
 duplicates drop
 sort WJP_password
-save "$path2data\1. Original\qrq_login.dta", replace 
+save "$path2data\1. Original\qrq_${year_current}_login.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Login) */
 clear
-use "$path2data\1. Original\qrq_2023_login.dta"
-merge 1:1 WJP_password using "$path2data\1. Original\qrq_login.dta"
+use "$path2data\1. Original\qrq_${year_previous}_login.dta"
+merge 1:1 WJP_password using "$path2data\1. Original\qrq_${year_current}_login.dta"
 keep if _merge==1
 drop _merge
 sort WJP_password
-save "$path2data\1. Original\qrq_2023_login_unique.dta", replace 
+save "$path2data\1. Original\qrq_${year_previous}_login_unique.dta", replace 
 
 
 /* Only answered in 2023 (and not in 2024) (Full data) */
 clear
-use "$path2data\1. Original\qrq_original_2023.dta"
+use "$path2data\1. Original\qrq_original_${year_previous}.dta"
 sort WJP_password
-merge m:1 WJP_password using "$path2data\1. Original\qrq_2023_login_unique.dta"
+merge m:1 WJP_password using "$path2data\1. Original\qrq_${year_previous}_login_unique.dta"
 
 replace _merge=3 if id_alex=="lb_English_1_28_2021_2022" // LB Gambia expert that answered CC in 2023 but not LB (old LB answer from 2021) DO NOT DELETE NEXT YEAR!!!!!!!!!!!!!!!!!!!!!!!!!!! CHECK IT!!!!!!
 replace _merge=3 if id_alex=="lb_English_0_587_2022" //LB Grenada that switched disciplines over years and are long CCs. DO NOT DELETE NEXT YEAR!!!!!!!!
@@ -162,22 +165,23 @@ replace _merge=3 if id_alex=="lb_French_1_470" //LB Guinea old, CJ AND CJ long 2
 
 keep if _merge==3
 drop _merge
-gen aux="2023"
+gen aux="${year_previous}"
 egen id_alex_1=concat(id_alex aux), punct(_)
 replace id_alex=id_alex_1
 drop id_alex_1 aux
 sort WJP_password
-save "$path2data\1. Original\qrq_2023.dta", replace
+save "$path2data\1. Original\qrq_${year_previous}.dta", replace
 
-erase "$path2data\1. Original\qrq_2023_login.dta"
-erase "$path2data\1. Original\qrq_login.dta"
-erase "$path2data\1. Original\qrq_2023_login_unique.dta"
+erase "$path2data\1. Original\qrq_${year_previous}_login.dta"
+erase "$path2data\1. Original\qrq_${year_current}_login.dta"
+erase "$path2data\1. Original\qrq_${year_previous}_login_unique.dta"
 
 
 /* Merging with 2023 data and older regular data*/
 clear
-use "$path2data\1. Original\qrq.dta"
-append using "$path2data\1. Original\qrq_2023.dta"
+use "$path2data\1. Original\qrq_${year_current}.dta"
+append using "$path2data\1. Original\qrq_${year_previous}.dta"
+
 
 *Dropping total scores from previous years
 drop total_score total_n f_1* f_2* f_3* f_4* f_6* f_7* f_8* N total_score_mean total_score_sd outlier outlier_CO
@@ -7205,7 +7209,7 @@ drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
 *Saving FINAL dataset AFTER adjusments
-save "$path2data\3. Final\qrq.dta", replace
+save "$path2data\3. Final\qrq_{$year_current}.dta", replace
 
 
 /*=================================================================================================================
@@ -7300,6 +7304,8 @@ drop total_score- total_score_mean
 *order WJP_password cc_q6a_usd cc_q6a_gni, last
 order WJP_password, last
 drop WJP_password
+
+br
 
 *Create scores
 do "${path2dos}\Routines\scores.do"

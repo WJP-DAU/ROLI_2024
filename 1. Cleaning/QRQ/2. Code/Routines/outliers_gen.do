@@ -14,10 +14,6 @@ This code will flag general outliers by total score and ROLI.
 					By total score
 =================================================================================================================*/
 
-
-bysort country: egen total_score_mean=mean(total_score)
-bysort country: egen total_score_sd=sd(total_score)
-
 gen outlier=0
 replace outlier=1 if total_score>=(total_score_mean+2.5*total_score_sd) & total_score!=.
 replace outlier=1 if total_score<=(total_score_mean-2.5*total_score_sd) & total_score!=.
