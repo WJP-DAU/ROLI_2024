@@ -25,7 +25,7 @@ according to the QRQ datamap.
 
 **** LONGITUDINAL ****
 
-import excel "$path2data\1. Original\PH Long 2024", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\PH Long ${year_current}", sheet("Worksheet") firstrow clear
 drop _ph*
 
 rename ResponseID SG_id
@@ -42,7 +42,7 @@ save "$path2data\1. Original\ph_final_long.dta", replace
 
 **** REGULAR ****
 
-import excel "$path2data\1. Original\PH Reg 2024", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\PH Reg ${year_current}", sheet("Worksheet") firstrow clear
 drop iVstatus ph_leftout-DX 
 gen longitudinal=0
 

@@ -25,7 +25,7 @@ according to the QRQ datamap.
 
 **** LONGITUDINAL ****
 
-import excel "$path2data\1. Original\CC Long 2024.xlsx", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\CC Long ${year_current}.xlsx", sheet("Worksheet") firstrow clear
 drop _cc*
 drop iVstatus cc_leftout-cc_referral3_language
 order SG_id
@@ -35,7 +35,7 @@ save "$path2data\1. Original\cc_final_long.dta", replace
 
 **** REGULAR ****
 
-import excel "$path2data\1. Original\CC Reg 2024.xlsx", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\CC Reg ${year_current}.xlsx", sheet("Worksheet") firstrow clear
 drop iVstatus cc_leftout-HR 
 gen longitudinal=0
 
@@ -60,7 +60,7 @@ egen id_alex=concat(question id), punct(_)
 drop id id_original
 
 /* These 3 lines are for incorporating 2023 data */
-gen year=2024
+gen year=${year_current}
 gen regular=0
 drop if language=="Last_Year"
 

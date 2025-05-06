@@ -25,7 +25,7 @@ according to the QRQ datamap.
 
 **** LONGITUDINAL ****
 
-import excel "$path2data\1. Original\LB Long 2024", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\LB Long ${year_current}", sheet("Worksheet") firstrow clear
 drop _lb*
 drop iVstatus lb_leftout-lb_referral3_language
 order SG_id
@@ -35,7 +35,7 @@ save "$path2data\1. Original\lb_final_long.dta", replace
 
 **** REGULAR ****
 
-import excel "$path2data\1. Original\LB Reg 2024", sheet("Worksheet") firstrow clear
+import excel "$path2data\1. Original\LB Reg ${year_current}", sheet("Worksheet") firstrow clear
 drop iVstatus lb_leftout-lb_referral3_language 
 gen longitudinal=0
 
