@@ -107,7 +107,7 @@ qrq_scores_change <- qrq_scores_2023 %>%
 
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ##
-## 3. Data validation system --------------------------                                                                                    ----
+## 3. Data validation system --------------------------                                                                                 
 ##
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -137,10 +137,10 @@ qrq_stage1 <- qrq_scenarios %>%
   mutate(
     # Select the minimum change scenario (if both mismatch or match equally)
     min_scenario = case_when(
-      s1_change == s2_change ~ "s1_change",
-      min(s1_change, s2_change, na.rm = TRUE) == s1_change ~ "s1_change",
-      min(s1_change, s2_change, na.rm = TRUE) == s2_change ~ "s2_change",
-      is.na(scores_2023) ~ "s1_change",
+      s1_change == s2_change ~ "s1_change", #Minimal Intervention
+      min(s1_change, s2_change, na.rm = TRUE) == s1_change ~ "s1_change", #Stability over time
+      min(s1_change, s2_change, na.rm = TRUE) == s2_change ~ "s2_change", #Stability over time
+      is.na(scores_2023) ~ "s1_change", #Minimal Intervention
       is.na(min(s1_change, s2_change)) ~ "No data"
     ),
     
@@ -148,8 +148,8 @@ qrq_stage1 <- qrq_scenarios %>%
     scenario_stage1 = case_when(
       s1_match_long == "Yes" & s2_match_long == "No" ~ "Scenario 1",
       s1_match_long == "No" & s2_match_long == "Yes" ~ "Scenario 2",
-      min_scenario == "s1_change" ~ "Scenario 1",
-      min_scenario == "s2_change" ~ "Scenario 2"
+      min_scenario == "s1_change" ~ "Scenario 1", #Following our principles
+      min_scenario == "s2_change" ~ "Scenario 2"  #Following our principles
     ),
     
     # Output selected score, change, direction, and large change flag
@@ -176,8 +176,8 @@ qrq_stage2 <- qrq_stage1 %>%
     
     # Determine directionally consistent score for s3
     s3_final = case_when(
-      long_direction == "Positive" ~ scores_s3_p,
-      long_direction == "Negative" ~ scores_s3_n,
+      long_direction == "Positive" ~ scores_s3_n,
+      long_direction == "Negative" ~ scores_s3_p,
       min(s3_change_n, s3_change_p, na.rm = TRUE) == s3_change_n ~ scores_s3_n,
       min(s3_change_n, s3_change_p, na.rm = TRUE) == s3_change_p ~ scores_s3_p,
       TRUE ~ scores_s3_p
@@ -189,8 +189,8 @@ qrq_stage2 <- qrq_stage1 %>%
     
     # Determine directionally consistent score for s4
     s4_final = case_when(
-      long_direction == "Positive" ~ scores_s4_p,
-      long_direction == "Negative" ~ scores_s4_n,
+      long_direction == "Positive" ~ scores_s4_n,
+      long_direction == "Negative" ~ scores_s4_p,
       min(s4_change_n, s4_change_p, na.rm = TRUE) == s4_change_n ~ scores_s4_n,
       min(s4_change_n, s4_change_p, na.rm = TRUE) == s4_change_p ~ scores_s4_p,
       TRUE ~ scores_s4_p
@@ -241,6 +241,7 @@ qrq_stage2 <- qrq_stage1 %>%
     country, variables, long_direction, ends_with("stage1"),
     ends_with("stage2"), scores_2023, scores_2024, scores_change, total_counts
   )
+
 ### Stage 3: Compare stage 1 vs 2 ------------------------------------------------------------------------------------------------
 
 qrq_final <- qrq_stage2 %>%
@@ -286,7 +287,7 @@ qrq_final <- qrq_stage2 %>%
 # ##
 # ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # options(scipen = 999)
-# 
+
 # qrq_scores_analysis <- qrq_final %>%
 #   mutate(
 #     diff_qrq = abs(scores_2024 - scores_final),
@@ -295,7 +296,7 @@ qrq_final <- qrq_stage2 %>%
 #       total_counts >= 41 & total_counts < 61 ~ "Medium counts",
 #       total_counts >= 61 ~ "High counts"
 #     )
-#   ) 
+#   )
 # 
 # 
 # # Create the histogram
@@ -306,8 +307,8 @@ qrq_final <- qrq_stage2 %>%
 #     color = "white",       # White borders for better visibility
 #     boundary = 0           # Align bins at 0
 #   ) +
-#   scale_x_continuous(breaks = seq(0,0.05,0.001),
-#                      limits = c(0, 0.05)
+#   scale_x_continuous(breaks = seq(0,0.1,0.001),
+#                      limits = c(0, 0.1)
 #                      ) +
 #   labs(
 #     title = "Distribution of Score Differences",
@@ -318,11 +319,13 @@ qrq_final <- qrq_stage2 %>%
 #   theme(
 #     text = element_text(family = "Lato"),
 #     plot.title = element_text(face = "bold", size = 14),
-#     axis.title = element_text(face = "bold")
+#     axis.title = element_text(face = "bold"),
+#     axis.text = element_text(angle = 90)
 #   );p
 # 
-# ggsave(plot = p, filename = "Histograma.svg", width = 8.5, height = 5.5)
+# # ggsave(plot = p, filename = "Histograma.svg", width = 8.5, height = 5.5)
 # 
+# "%!in%" <- compose("!", "%in%")
 # data2plot <- qrq_scores_analysis %>%
 #   filter(variables %!in% "ROLI") %>%
 #   mutate(
@@ -342,13 +345,13 @@ qrq_final <- qrq_stage2 %>%
 #                  y = proportion,
 #                  label = paste0(proportion, "%")
 #              )
-# ) + 
-#   geom_col(alpha = 0.5, 
+# ) +
+#   geom_col(alpha = 0.5,
 #            position = "identity",
 #            colour = "white",
 #            fill = "#0072B2")+
 #   geom_text(size = 2.811678,
-#             vjust = -1, 
+#             vjust = -1,
 #             show.legend = F)+
 #   scale_y_continuous(breaks = seq(0,70,10),
 #                      limits = c(0, 70)) +
@@ -367,7 +370,7 @@ qrq_final <- qrq_stage2 %>%
 #     panel.grid.minor   = element_blank(),
 #     legend.position    = "top"
 #   );p2
-# 
+
 # ggsave(plot = p2, filename = "Scenarios.svg", width = 8.5, height = 5.5)
 # 
 # 
