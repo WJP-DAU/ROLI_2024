@@ -37,13 +37,6 @@ for (mod in modules){
 ##
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# Helper: Load and pivot scenario files
-load_scenario <- function(file, value_name) {
-  read_dta(file) %>%
-    select(country, f_1:f_8, ROLI) %>%
-    pivot_longer(cols = -country, names_to = "variables", values_to = value_name)
-}
-
 ### Scenarios --------------------------------------------------------------------------------------------------
 
 # Load all QRQ scenario data (s1-s4, p/n) following the flagging mechanism structure
@@ -105,180 +98,97 @@ qrq_scores_change <- qrq_scores_2023 %>%
     scores_big_change = if_else(abs(scores_change) > 0.05, "Yes", "No")
   )
 
-## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ##
-## 3. Data validation system --------------------------                                                                                 
+## 3. Data validation system                                                                                 
 ##
-## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-### Stage 1: Compare scenarios 1 vs 2 (remove expert) ------------------------------------------------------------------------------------------------
-
-qrq_stage1 <- qrq_scenarios %>%
+# PREP: Join necessary data
+qrq_base_stage1 <- qrq_scenarios %>%
   left_join(qrq_benchmark, by = c("country", "variables")) %>%
-  left_join(qrq_scores_change, by = c("country", "variables")) %>%
-  mutate(
-    # Calculate change in score for each scenario relative to previous year
-    s1_change = scores_s1 - scores_2023,
-    s2_change = scores_s2 - scores_2023,
-    
-    # Direction of change
-    s1_direction = if_else(s1_change > 0, "Positive", "Negative"),
-    s2_direction = if_else(s2_change > 0, "Positive", "Negative"),
-    
-    # Large change indicator (absolute change > 0.05)
-    s1_scores_big_change = if_else(abs(s1_change) > 0.05, "Yes", "No"),
-    s2_scores_big_change = if_else(abs(s2_change) > 0.05, "Yes", "No"),
-    
-    # Match with benchmark direction
-    s1_match_long = if_else(s1_direction == long_direction, "Yes", "No", missing = "No data"),
-    s2_match_long = if_else(s2_direction == long_direction, "Yes", "No", missing = "No data")
-  ) %>%
-  rowwise() %>%
-  mutate(
-    # Select the minimum change scenario (if both mismatch or match equally)
-    min_scenario = case_when(
-      s1_change == s2_change ~ "s1_change", #Minimal Intervention
-      min(s1_change, s2_change, na.rm = TRUE) == s1_change ~ "s1_change", #Stability over time
-      min(s1_change, s2_change, na.rm = TRUE) == s2_change ~ "s2_change", #Stability over time
-      is.na(scores_2023) ~ "s1_change", #Minimal Intervention
-      is.na(min(s1_change, s2_change)) ~ "No data"
-    ),
-    
-    # Apply selection logic
-    scenario_stage1 = case_when(
-      s1_match_long == "Yes" & s2_match_long == "No" ~ "Scenario 1",
-      s1_match_long == "No" & s2_match_long == "Yes" ~ "Scenario 2",
-      min_scenario == "s1_change" ~ "Scenario 1", #Following our principles
-      min_scenario == "s2_change" ~ "Scenario 2"  #Following our principles
-    ),
-    
-    # Output selected score, change, direction, and large change flag
-    scores_stage1 = if_else(scenario_stage1 == "Scenario 1", scores_s1, scores_s2),
-    scores_change_stage1 = if_else(scenario_stage1 == "Scenario 1", s1_change, s2_change),
-    scores_direction_stage1 = if_else(scenario_stage1 == "Scenario 1", s1_direction, s2_direction),
-    scores_big_change_stage1 = if_else(scenario_stage1 == "Scenario 1", s1_scores_big_change, s2_scores_big_change)
-  ) %>%
-  ungroup() %>%
+  left_join(qrq_scores_change, by = c("country", "variables"))
+
+### Stage 1: Compare scenarios 1 vs 2 (remove expert) --------------------------------------
+
+qrq_stage1 <- compare_scenarios(
+  df = qrq_base_stage1,
+  score_a = "scores_s1",
+  score_b = "scores_s2",
+  direction_benchmark = "long_direction",
+  year_ref = "scores_2023",
+  scenario_labels = c("Scenario 1", "Scenario 2"),
+  suffix = "stage1"
+) %>%
   select(
     country, variables, total_counts, scores_2023, scores_2024, scores_change,
     scores_s3_n, scores_s3_p, scores_s4_n, scores_s4_p, long_direction,
     ends_with("stage1")
   )
 
-### Stage 2: Compare scenarios 3 vs 4 (remove responses) ------------------------------------------------------------------------------------------------
+### Stage 2: Compare scenarios 3 vs 4 (remove responses) --------------------------------------
 
-qrq_stage2 <- qrq_stage1 %>%
+# Compute directionally consistent s3 and s4 scores
+qrq_stage2_input <- qrq_stage1 %>%
   rowwise() %>%
   mutate(
-    # Compute score changes for question-level (s3) scenarios
     s3_change_p = scores_s3_p - scores_2023,
     s3_change_n = scores_s3_n - scores_2023,
-    
-    # Determine directionally consistent score for s3
     s3_final = case_when(
       long_direction == "Positive" ~ scores_s3_n,
       long_direction == "Negative" ~ scores_s3_p,
-      min(s3_change_n, s3_change_p, na.rm = TRUE) == s3_change_n ~ scores_s3_n,
-      min(s3_change_n, s3_change_p, na.rm = TRUE) == s3_change_p ~ scores_s3_p,
+      min(c(s3_change_n, s3_change_p), na.rm = TRUE) == s3_change_n ~ scores_s3_n,
+      min(c(s3_change_n, s3_change_p), na.rm = TRUE) == s3_change_p ~ scores_s3_p,
       TRUE ~ scores_s3_p
     ),
-    
-    # Compute score changes for sub-factor-level (s4) scenarios
     s4_change_p = scores_s4_p - scores_2023,
     s4_change_n = scores_s4_n - scores_2023,
-    
-    # Determine directionally consistent score for s4
     s4_final = case_when(
       long_direction == "Positive" ~ scores_s4_n,
       long_direction == "Negative" ~ scores_s4_p,
-      min(s4_change_n, s4_change_p, na.rm = TRUE) == s4_change_n ~ scores_s4_n,
-      min(s4_change_n, s4_change_p, na.rm = TRUE) == s4_change_p ~ scores_s4_p,
+      min(c(s4_change_n, s4_change_p), na.rm = TRUE) == s4_change_n ~ scores_s4_n,
+      min(c(s4_change_n, s4_change_p), na.rm = TRUE) == s4_change_p ~ scores_s4_p,
       TRUE ~ scores_s4_p
     )
   ) %>%
-  ungroup() %>%
-  mutate(
-    # Calculate change and direction for s3 and s4
-    s3_change = s3_final - scores_2023,
-    s4_change = s4_final - scores_2023,
-    
-    s3_direction = if_else(s3_change > 0, "Positive", "Negative"),
-    s4_direction = if_else(s4_change > 0, "Positive", "Negative"),
-    
-    s3_scores_big_change = if_else(abs(s3_change) > 0.05, "Yes", "No"),
-    s4_scores_big_change = if_else(abs(s4_change) > 0.05, "Yes", "No"),
-    
-    s3_match_long = if_else(s3_direction == long_direction, "Yes", "No", missing = "No data"),
-    s4_match_long = if_else(s4_direction == long_direction, "Yes", "No", missing = "No data")
-  ) %>%
-  rowwise() %>%
-  mutate(
-    # Select minimum-change scenario between s3 and s4
-    min_scenario = case_when(
-      s3_change == s4_change ~ "s3_change",
-      min(s3_change, s4_change, na.rm = TRUE) == s3_change ~ "s3_change",
-      min(s3_change, s4_change, na.rm = TRUE) == s4_change ~ "s4_change",
-      is.na(scores_2023) ~ "s3_change",
-      is.na(min(s3_change, s4_change)) ~ "No data"
-    ),
-    
-    # Apply selection logic
-    scenario_stage2 = case_when(
-      s3_match_long == "Yes" & s4_match_long == "No" ~ "Scenario 3",
-      s3_match_long == "No" & s4_match_long == "Yes" ~ "Scenario 4",
-      min_scenario == "s3_change" ~ "Scenario 3",
-      min_scenario == "s4_change" ~ "Scenario 4"
-    ),
-    
-    # Output selected score, change, direction, and large change flag
-    scores_stage2 = if_else(scenario_stage2 == "Scenario 3", s3_final, s4_final),
-    scores_change_stage2 = if_else(scenario_stage2 == "Scenario 3", s3_change, s4_change),
-    scores_direction_stage2 = if_else(scenario_stage2 == "Scenario 3", s3_direction, s4_direction),
-    scores_big_change_stage2 = if_else(scenario_stage2 == "Scenario 3", s3_scores_big_change, s4_scores_big_change)
-  ) %>%
-  ungroup() %>%
+  ungroup()
+
+qrq_stage2 <- compare_scenarios(
+  df = qrq_stage2_input,
+  score_a = "s3_final",
+  score_b = "s4_final",
+  direction_benchmark = "long_direction",
+  year_ref = "scores_2023",
+  scenario_labels = c("Scenario 3", "Scenario 4"),
+  suffix = "stage2"
+) %>%
   select(
     country, variables, long_direction, ends_with("stage1"),
     ends_with("stage2"), scores_2023, scores_2024, scores_change, total_counts
   )
 
-### Stage 3: Compare stage 1 vs 2 ------------------------------------------------------------------------------------------------
+### Stage 3: Compare stage 1 vs 2 --------------------------------------
 
-qrq_final <- qrq_stage2 %>%
-  mutate(
-    # Evaluate agreement between direction of Stage 1 and Stage 2 with the benchmark
-    stage1_match_long = if_else(scores_direction_stage1 == long_direction, "Yes", "No", missing = "No data"),
-    stage2_match_long = if_else(scores_direction_stage2 == long_direction, "Yes", "No", missing = "No data")
-  ) %>%
-  rowwise() %>%
-  mutate(
-    # Determine which stage involves the smaller change
-    min_scenario = case_when(
-      scores_change_stage1 == scores_change_stage2 ~ "scores_change_stage1",
-      min(scores_change_stage1, scores_change_stage2, na.rm = TRUE) == scores_change_stage1 ~ "scores_change_stage1",
-      min(scores_change_stage1, scores_change_stage2, na.rm = TRUE) == scores_change_stage2 ~ "scores_change_stage2",
-      is.na(scores_2023) ~ "scores_change_stage1",
-      is.na(min(scores_change_stage1, scores_change_stage2)) ~ "No data"
-    ),
-    
-    # Final decision: which scenario to use
-    scenario_final = case_when(
-      stage1_match_long == "Yes" & stage2_match_long == "No" ~ scenario_stage1,
-      stage1_match_long == "No" & stage2_match_long == "Yes" ~ scenario_stage2,
-      min_scenario == "scores_change_stage1" ~ scenario_stage1,
-      min_scenario == "scores_change_stage2" ~ scenario_stage2
-    ),
-    
-    # Extract final values
-    scores_final = if_else(scenario_final == scenario_stage1, scores_stage1, scores_stage2),
-    scores_change_final = if_else(scenario_final == scenario_stage1, scores_change_stage1, scores_change_stage2),
-    scores_direction_final = if_else(scenario_final == scenario_stage1, scores_direction_stage1, scores_direction_stage2),
-    scores_big_change_final = if_else(scenario_final == scenario_stage1, scores_big_change_stage1, scores_big_change_stage2)
-  ) %>%
-  ungroup() %>%
+qrq_final <- compare_stages(
+  df = qrq_stage2,
+  score_a       = "scores_stage1",
+  change_a      = "scores_change_stage1",
+  direction_a   = "scores_direction_stage1",
+  big_change_a  = "scores_big_change_stage1",
+  label_a       = "scenario_stage1",
+  
+  score_b       = "scores_stage2",
+  change_b      = "scores_change_stage2",
+  direction_b   = "scores_direction_stage2",
+  big_change_b  = "scores_big_change_stage2",
+  label_b       = "scenario_stage2",
+  
+  direction_benchmark = "long_direction",
+  suffix = "final"
+) %>%
   select(
     country, variables, long_direction, ends_with("final"),
-    scores_2023, scores_2024, scores_change, total_counts
+    scores_2023, scores_2024, scores_change, total_counts, match_stage_a_b
   )
 
 # ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -322,7 +232,7 @@ qrq_final <- qrq_stage2 %>%
 #     axis.title = element_text(face = "bold"),
 #     axis.text = element_text(angle = 90)
 #   );p
-# 
+
 # # ggsave(plot = p, filename = "Histograma.svg", width = 8.5, height = 5.5)
 # 
 # "%!in%" <- compose("!", "%in%")
