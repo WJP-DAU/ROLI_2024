@@ -28,12 +28,16 @@ set maxvar 120000
 *--- Required packages:
 * NONE
 
+*--- Years of analysis
+global year_current "2024"
+global year_previous "2023"
+
 *--- Defining paths to SharePoint & your local Git Repo copy:
 
 *------ (a) Natalia Rodriguez:
 if (inlist("`c(username)'", "nrodriguez")) {
-	global path2SP "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Data Analytics\7. WJP ROLI\ROLI_2024\1. Cleaning\QRQ"
-	global path2GH "C:\Users\nrodriguez\OneDrive - World Justice Project\Natalia\GitHub\ROLI_2024\1. Cleaning\QRQ"
+	global path2SP "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Data Analytics\7. WJP ROLI\ROLI_${year_current}\1. Cleaning\QRQ"
+	global path2GH "C:\Users\nrodriguez\OneDrive - World Justice Project\Natalia\GitHub\ROLI_${year_current}\1. Cleaning\QRQ"
 	
 	*global path2data "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\QRQ\QRQ 2024\Final Data\excel"
 	*global path2exp  "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Index Data & Analysis\2024\QRQ"
@@ -50,10 +54,6 @@ global path2data "${path2SP}\1. Data"
 
 *Path 2dos: Path to do-files (Routines). 
 global path2dos  "${path2GH}\2. Code"
-
-*Years of analysis
-global year_current "2024"
-global year_previous "2023"
 
 
 /*=================================================================================================================

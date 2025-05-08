@@ -7311,7 +7311,7 @@ br
 do "${path2dos}\Routines\scores.do"
 
 *Saving final dataset
-save "$path2data\3. Final\qrq_country_averages_2024.dta", replace
+save "$path2data\3. Final\qrq_country_averages_${year_current}.dta", replace
 
 
 
