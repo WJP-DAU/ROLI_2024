@@ -7209,7 +7209,7 @@ drop total_score_mean
 bysort country: egen total_score_mean=mean(total_score)
 
 *Saving FINAL dataset AFTER adjusments
-save "$path2data\3. Final\qrq_{$year_current}.dta", replace
+save "$path2data\3. Final\qrq_${year_current}.dta", replace
 
 
 /*=================================================================================================================
