@@ -20,7 +20,7 @@
 ##
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# Loading additional code modules
+# Loading additional code module
 modules <- c(
   "settings" 
 )
@@ -191,404 +191,197 @@ qrq_final <- compare_stages(
     scores_2023, scores_2024, scores_change, total_counts, match_stage_a_b
   )
 
-# ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ##
-# ## 4.  Data Analysis                                                                                     ----
-# ##
-# ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# options(scipen = 999)
+## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+##
+## 4.  Data Analysis                                                                                     ----
+##
+## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# qrq_scores_analysis <- qrq_final %>%
-#   mutate(
-#     diff_qrq = abs(scores_2024 - scores_final),
-#     level = case_when(
-#       total_counts < 41 ~ "Low counts",
-#       total_counts >= 41 & total_counts < 61 ~ "Medium counts",
-#       total_counts >= 61 ~ "High counts"
-#     )
-#   )
-# 
-# 
-# # Create the histogram
-# p <- ggplot(data = qrq_scores_analysis, aes(x = diff_qrq)) +
-#   geom_histogram(
-#     binwidth = 0.001,       # Adjust bin width as needed
-#     fill = "#0072B2",      # Blue color for bars
-#     color = "white",       # White borders for better visibility
-#     boundary = 0           # Align bins at 0
-#   ) +
-#   scale_x_continuous(breaks = seq(0,0.1,0.001),
-#                      limits = c(0, 0.1)
-#                      ) +
-#   labs(
-#     title = "Distribution of Score Differences",
-#     x = "Difference in Scores (|2024 - Final|)",
-#     y = "Number of Observations"
-#   ) +
-#   theme_minimal() +
-#   theme(
-#     text = element_text(family = "Lato"),
-#     plot.title = element_text(face = "bold", size = 14),
-#     axis.title = element_text(face = "bold"),
-#     axis.text = element_text(angle = 90)
-#   );p
+"%!in%" <- compose("!", "%in%")
 
-# # ggsave(plot = p, filename = "Histograma.svg", width = 8.5, height = 5.5)
-# 
-# "%!in%" <- compose("!", "%in%")
-# data2plot <- qrq_scores_analysis %>%
-#   filter(variables %!in% "ROLI") %>%
-#   mutate(
-#     counter = 1
-#   ) %>%
-#   group_by(scenario_final) %>%
-#   summarise(
-#     value = sum(counter, na.rm = T)
-#   ) %>%
-#   drop_na() %>%
-#   mutate(
-#     proportion = round(value/sum(value)*100, 0)
-#   )
-# 
-# p2 <- ggplot(data = data2plot,
-#              aes(x      = scenario_final,
-#                  y = proportion,
-#                  label = paste0(proportion, "%")
-#              )
-# ) +
-#   geom_col(alpha = 0.5,
-#            position = "identity",
-#            colour = "white",
-#            fill = "#0072B2")+
-#   geom_text(size = 2.811678,
-#             vjust = -1,
-#             show.legend = F)+
-#   scale_y_continuous(breaks = seq(0,70,10),
-#                      limits = c(0, 70)) +
-#   labs(
-#     y         = " ",
-#     x         = " "
-#   ) +
-#   theme(
-#     axis.ticks         = element_blank(),
-#     plot.margin        = unit(c(2.5, 7.5, 7.5, 2.5), "mm"),
-#     panel.background   = element_rect(fill = "white",
-#                                       size = 2),
-#     panel.grid.major   = element_line(size     = 0.5,
-#                                       colour   = "grey93",
-#                                       linetype = "solid"),
-#     panel.grid.minor   = element_blank(),
-#     legend.position    = "top"
-#   );p2
+qrq_scores_analysis <- qrq_final %>%
+  filter(variables %!in% "f_5") %>%
+  filter(variables %!in% "ROLI") %>%
+  mutate(
+    diff_qrq_raw = scores_2024 - scores_final,
+    diff_qrq = abs(diff_qrq_raw),
+    level = case_when(
+      total_counts < 41 ~ "3. Low counts",
+      total_counts >= 41 & total_counts < 61 ~ "2. Medium counts",
+      total_counts >= 61 ~ "1. High counts"
+    ),
+    diff_cat = case_when(
+      diff_qrq == 0                      ~ "No differences",
+      diff_qrq > 0 & diff_qrq < 0.01     ~ "Differences below 0.01",
+      diff_qrq >= 0.01 & diff_qrq < 0.05 ~ "Differences between 0.01 and 0.05",
+      diff_qrq >= 0.05 & diff_qrq < 0.1  ~ "Differences between 0.05 and 0.1",
+      diff_qrq >= 0.1                    ~ "Differences above 0.1"
+    ),
+    scores_direction = case_when(
+      scores_change < 0 ~ "Negative",
+      scores_change > 0 ~ "Positive",
+      scores_change == 0 ~ "No change"
+    ),
+    diff_direction = case_when(
+      scores_direction_final == scores_direction ~ "Same direction",
+      scores_direction_final != scores_direction ~ "Different direction",
+      T ~ "Review"
+    )
+  ) %>%
+  group_by(variables) %>%
+  mutate(
+    scores_2024_ranking  = rank(-scores_2024),
+    scores_final_ranking = rank(-scores_final),
+    diff_ranking = abs(scores_2024_ranking - scores_final_ranking),
+  ) %>%
+  ungroup() %>%
+  mutate(
+    diff_ranking_cat = case_when(
+      diff_ranking == 0                      ~ "No differences",
+      diff_ranking > 0 & diff_ranking < 5    ~ "Differences between 1 and 5",
+      diff_ranking >= 5 & diff_ranking < 10  ~ "Differences between 5 and 10",
+      diff_ranking >= 10 & diff_ranking < 20 ~ "Differences between 10 and 20",
+      diff_ranking >= 20                     ~ "Differences above 20")
+  )
 
-# ggsave(plot = p2, filename = "Scenarios.svg", width = 8.5, height = 5.5)
-# 
-# 
-# qrq_big_diff <- qrq_scores_analysis %>%
-#   
-# 
-# qrq_system_results <- qrq_scores_analysis %>%
-#   group_by(variables) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x,5)
-#     )
-#   ) %>%
-#   filter(variables %!in% "ROLI")
-# 
-# qrq_system_results <- qrq_scores_analysis %>%
-#   group_by(variables, level) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x,5)
-#     )
-#   ) %>%
-#   filter(variables %!in% "ROLI") %>%
-#   pivot_wider(id_cols = c(variables), names_from = level, values_from = diff_qrq) %>%
-#   select(variables, `High counts`, `Medium counts`, `Low counts`)
-# 
-# 
-# qrq_system_results <- qrq_scores_analysis %>%
-#   mutate(
-#     match_direction = if_else(long_direction == scores_direction_final, "Yes", "No"),
-#     final_direction = if_else(scores_change > 0, "Positive", "Negative"),
-#     final_match = if_else(final_direction == scores_direction_final, "Yes", "No")
-#   )
-# 
-# qrq_system_results <- qrq_scores_analysis %>%
-#   mutate(
-#     match_direction = if_else(long_direction == scores_direction_final, "Yes", "No", "No data")
-#   ) %>%
-#   group_by(variables, level, match_direction) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x,5)
-#     )
-#   ) %>%
-#   filter(variables %!in% "ROLI") %>%
-#   pivot_wider(id_cols = c(variables, match_direction), names_from = level, values_from = diff_qrq) %>%
-#   select(variables, match_direction, `High counts`, `Medium counts`, `Low counts`) %>%
-#   drop_na() %>%
-#   arrange(match_direction) %>%
-#   filter(
-#     match_direction != "No data"
-#   )
-# 
-# ### +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# ###
-# ### Analisis Factor                                                                            ----
-# ###
-# ### +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# 
-# "%!in%" <- compose("!","%in%")
-# 
-# qrq_system <- qrq_scores_2024 %>%
-#   left_join(qrq_s1, by = c("country", "variables")) %>%
-#   left_join(qrq_s2, by = c("country", "variables")) %>%
-#   left_join(qrq_s3, by = c("country", "variables")) %>%
-#   left_join(qrq_s4, by = c("country", "variables")) %>%
-#   left_join(qrq_s5, by = c("country", "variables")) %>%
-#   left_join(qrq_country_counts, by = "country")
-# 
-# qrq_system <- qrq_system %>%
-#   mutate(
-#     diff_s1 = scores_2024 - scores_s1,
-#     diff_s2 = scores_2024 - scores_s2,
-#     diff_s3 = scores_2024 - scores_s3,
-#     diff_s4 = scores_2024 - scores_s4,
-#     diff_s5 = scores_2024 - scores_s5
-#   ) %>%
-#   mutate(
-#     level = 
-#       case_when(
-#         total_counts < 41 ~ "Low counts",
-#         total_counts > 40   & total_counts < 61 ~ "Medium counts",
-#         total_counts > 60 ~ "High counts"
-#       )
-#   )
-# 
-# writexl::write_xlsx(qrq_system, path = "diff_scores_2024.xlsx")  
-# 
-# qrq_diff <- qrq_system %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~abs(.x)
-#     ),
-#     across(
-#       starts_with("diff"),
-#       ~if_else(is.na(scores_2024) == T, NA_real_, .x)
-#     )
-#   ) %>%
-#   rowwise() %>%
-#   mutate(
-#     diff_best_scenario = 
-#       if_else(
-#         is.na(scores_2024) == T, NA_real_,
-#         min(c(diff_s1, diff_s2, diff_s3, diff_s4, diff_s5), na.rm = T)
-#         ),
-#     best_scenario = 
-#       case_when(
-#         diff_best_scenario == diff_s1 ~ "Scenario 1",
-#         diff_best_scenario == diff_s2 ~ "Scenario 2",
-#         diff_best_scenario == diff_s3 ~ "Scenario 3",
-#         diff_best_scenario == diff_s4 ~ "Scenario 4",
-#         diff_best_scenario == diff_s5 ~ "Scenario 5"
-#       )
-#   ) %>%
-#   mutate(
-#     score_best_scenario = 
-#       case_when(
-#         best_scenario == "Scenario 1" ~ scores_s1,
-#         best_scenario == "Scenario 2" ~ scores_s2,
-#         best_scenario == "Scenario 3" ~ scores_s3,
-#         best_scenario == "Scenario 4" ~ scores_s4,
-#         best_scenario == "Scenario 5" ~ scores_s5
-#       )
-#   ) %>%
-#   group_by(country) %>%
-#   mutate(ROLI_best_scenario = mean(score_best_scenario, na.rm = T)) %>%
-#   ungroup()
-# 
-# p <- ggplot(data = qrq_diff %>%
-#               filter(variables %!in% "ROLI"), 
-#             aes(x      = diff_best_scenario
-#                 #fill   = status)
-#                 )
-#             )+ 
-#   geom_histogram(alpha = 0.5, 
-#                  position = "identity",
-#                  colour = "white") +
-#   scale_x_continuous(breaks = seq(0,0.15,0.01)) +
-#   scale_y_continuous(limits = c(0,500),
-#                      breaks = seq(0,500,50)) +
-#   labs(
-#     y         = "Number of factors",
-#     x         = "Differences in scores"
-#   ) +
-#   theme(
-#     axis.ticks         = element_blank(),
-#     plot.margin        = unit(c(2.5, 7.5, 7.5, 2.5), "mm"),
-#     panel.background   = element_rect(fill = "white",
-#                                       size = 2),
-#     panel.grid.major   = element_line(size     = 0.5,
-#                                       colour   = "grey93",
-#                                       linetype = "solid"),
-#     panel.grid.minor   = element_blank(),
-#     legend.position    = "top"
-#   );p
-# ggsave(plot = p, filename = "Histograma.svg", width = 8.5, height = 5.5)
-# 
-# data2plot <- qrq_diff %>%
-#   filter(variables %!in% "ROLI") %>%
-#   mutate(
-#     counter = 1
-#   ) %>%
-#   group_by(best_scenario) %>%
-#   summarise(
-#     value = sum(counter, na.rm = T)
-#   ) %>%
-#   drop_na() %>%
-#   mutate(
-#     proportion = round(value/sum(value)*100, 0)
-#   )
-# 
-# p2 <- ggplot(data = data2plot,
-#              aes(x      = best_scenario,
-#                  y = proportion,
-#                  label = paste0(proportion, "%")
-#              )
-#              ) + 
-#   geom_col(alpha = 0.5, 
-#            position = "identity",
-#            colour = "white")+
-#   geom_text(size = 2.811678,
-#             vjust = -1, 
-#             show.legend = F)+
-#   scale_y_continuous(breaks = seq(0,40,10),
-#                      limits = c(0, 40)) +
-#   labs(
-#     y         = " ",
-#     x         = " "
-#   ) +
-#   theme(
-#     axis.ticks         = element_blank(),
-#     plot.margin        = unit(c(2.5, 7.5, 7.5, 2.5), "mm"),
-#     panel.background   = element_rect(fill = "white",
-#                                       size = 2),
-#     panel.grid.major   = element_line(size     = 0.5,
-#                                       colour   = "grey93",
-#                                       linetype = "solid"),
-#     panel.grid.minor   = element_blank(),
-#     legend.position    = "top"
-#   );p2
-#   
-# ggsave(plot = p2, filename = "Scenarios.svg", width = 8.5, height = 5.5)
-# 
-# qrq_system_results <- qrq_diff %>%
-#   group_by(variables) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x*100,2)
-#     )
-#   ) %>%
-#   mutate(
-#     diff_raw = diff_best_scenario - diff_s1
-#   ) %>%
-#   filter(variables %!in% "ROLI")
-# 
-# ROLI_final <- qrq_diff %>%
-#   filter(variables %in% "ROLI") %>%
-#   select(country, variables, scores_2024, score_best_scenario, ROLI_best_scenario) %>%
-#   mutate(
-#     diff_roli = scores_2024 - ROLI_best_scenario,
-#     diff_roli = abs(diff_roli)
-#   ) %>%
-#   summarise(
-#     diff_roli = mean(diff_roli, na.rm = T),
-#     diff_roli = round(diff_roli*100, 3)
-#   )
-# 
-# qrq_system_results_ROLI <- qrq_diff %>%
-#   group_by(variables) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x*100,3)
-#     )
-#   ) %>%
-#   filter(variables %in% "ROLI") %>%
-#   cbind(ROLI_final) %>%
-#   mutate(
-#     diff_raw = diff_roli - diff_s1
-#   ) 
-# 
-# 
-# 
-# 
-# ROLI_final_level <- qrq_diff %>%
-#   filter(variables %in% "ROLI") %>%
-#   select(country, variables, scores_2024, score_best_scenario, ROLI_best_scenario, level) %>%
-#   group_by(level) %>%
-#   mutate(
-#     diff_roli = scores_2024 - ROLI_best_scenario,
-#     diff_roli = abs(diff_roli)
-#   ) %>%
-#   summarise(
-#     diff_roli = mean(diff_roli, na.rm = T),
-#     diff_roli = round(diff_roli*100, 3)
-#   )
-# 
-# qrq_system_results_ROLI_level <- qrq_diff %>%
-#   group_by(variables, level) %>%
-#   summarise(
-#     across(
-#       starts_with("diff"),
-#       ~mean(.x, na.rm = T)
-#     )
-#   ) %>%
-#   mutate(
-#     across(
-#       starts_with("diff"),
-#       ~round(.x*100,3)
-#     )
-#   ) %>%
-#   filter(variables %in% "ROLI") %>%
-#   cbind(ROLI_final_level) %>%
-#   mutate(
-#     diff_raw = diff_roli - diff_s1
-#   ) 
+### Proportions analysis ------------------------------------------------------
+
+#### Rankings
+
+diff_rankings <- c(
+  "No differences",
+  "Differences between 1 and 5",
+  "Differences between 5 and 10",
+  "Differences between 10 and 20",
+  "Differences above 20"
+)
+
+data_rankings   <- proportions_data(qrq_scores_analysis, "diff_ranking_cat", diff_rankings)
+p_diff_ranking  <- plot_bar(data_rankings, 
+                            "diff_ranking_cat",
+                            "Rankings differences 2024");p_diff_ranking
+
+ggsave(plot = p_diff_ranking, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_ranking.svg"),
+       width = 10,
+       height = 7)
+
+#### Scenarios
+
+scenario_levels <- c(
+  "Scenario 1",
+  "Scenario 2",
+  "Scenario 3",
+  "Scenario 4"
+)
+
+data_scenarios  <- proportions_data(qrq_scores_analysis, "scenario_final", scenario_levels)
+p_scenarios     <- plot_bar(data_scenarios, 
+                            "scenario_final",
+                            "Scenarios 2024");p_scenarios
+
+ggsave(plot = p_scenarios, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_scenarios.svg"),
+       width = 10,
+       height = 7)
+
+#### Differences
+
+diff_levels <- c(
+  "No differences",
+  "Differences below 0.01",
+  "Differences between 0.01 and 0.05",
+  "Differences between 0.05 and 0.1",
+  "Differences above 0.1"
+)
+
+data_diff       <- proportions_data(qrq_scores_analysis, "diff_cat", diff_levels)
+p_differences   <- plot_bar(data_diff, 
+                            "diff_cat",
+                            "Distribution of differences 2024");p_differences
+
+ggsave(plot = p_differences, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_levels.svg"),
+       width = 10,
+       height = 7)
+
+#### Directions
+
+direction_levels <- c(
+  "Same direction",
+  "Different direction"
+)
+
+data_direction  <- proportions_data(qrq_scores_analysis, "diff_direction", direction_levels)
+p_direction     <- plot_bar(data_direction, 
+                            "diff_direction",
+                            "Differences in the direction 2024");p_direction
+
+ggsave(plot = p_direction, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_direction.svg"),
+       width = 10,
+       height = 7)
+
+### Averages analysis ------------------------------------------------------
+
+data_diff_factor <- qrq_scores_analysis %>%
+  group_by(variables) %>%
+  summarise(avg_diff = mean(diff_qrq, na.rm = T))
+
+print(data_diff_factor)
+
+data_diff_level <- qrq_scores_analysis %>%
+  group_by(level) %>%
+  summarise(avg_diff = mean(diff_qrq, na.rm = T))
+
+print(data_diff_level)
+
+### Ranking analysis ------------------------------------------------------
+
+data_diff_factor_ranking <- qrq_scores_analysis %>%
+  group_by(variables) %>%
+  summarise(avg_diff = mean(diff_ranking, na.rm = T))
+
+print(data_diff_factor_ranking)
+
+data_diff_level_ranking <- qrq_scores_analysis %>%
+  group_by(level) %>%
+  summarise(avg_diff = mean(diff_ranking, na.rm = T))
+
+print(data_diff_level_ranking)
+
+### Direction analysis ------------------------------------------------------
+
+data_diff_direction <- qrq_scores_analysis %>%
+  group_by(diff_direction) %>%
+  summarise(avg_diff = mean(diff_qrq, na.rm = T))
+
+print(data_diff_direction)
+
+data_diff_direction_ranking <- qrq_scores_analysis %>%
+  group_by(diff_direction) %>%
+  summarise(avg_diff = mean(diff_ranking, na.rm = T))
+
+print(data_diff_direction_ranking)
+
+data_diff_direction_ranking <- qrq_scores_analysis %>%
+  group_by(diff_direction) %>%
+  summarise(avg_diff = mean(diff_ranking, na.rm = T))
+
+print(data_diff_direction_ranking)
+
+### Direction diff analysis ------------------------------------------------------
+
+qrq_negative <- qrq_scores_analysis %>%
+  filter(scores_direction_final %in% "Negative") %>%
+  summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
+            avg_diff_scores = mean(scores_change, na.rm = T))
+
+print(qrq_negative)
+
+qrq_positive <- qrq_scores_analysis %>%
+  filter(scores_direction_final %in% "Positive") %>%
+  summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
+            avg_diff_scores = mean(scores_change, na.rm = T))
+
+print(qrq_positive)

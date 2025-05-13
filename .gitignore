@@ -72,3 +72,4 @@ vignettes/*.pdf
 1. Cleaning/TPS/1. Data/1. Original/World Governance Indicators/wgidataset-stata.zip
 1. Cleaning/QRQ/3. Outcomes/Fist iteration/Scenarios.svg
 1. Cleaning/QRQ/3. Outcomes/Fist iteration/Histograma.svg
+*.svg

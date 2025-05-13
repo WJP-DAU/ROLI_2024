@@ -38,12 +38,12 @@ p_load(char = c(
 
 if (Sys.info()["user"] == "santiagopardo") {
   
-  path2EU <- paste0("/Users/santiagopardo/OneDrive - World Justice Project/EU Subnational")
-  path2DA <- paste0("/Users/santiagopardo/OneDrive - World Justice Project/Data Analytics")
+  path2DA <- paste0("/Users/santiagopardo/OneDrive - World Justice Project/Data Analytics/7. WJP ROLI/ROLI_2024/1. Cleaning/QRQ")
   
 } else {
   "INSERT PATH"
 }
+
 
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ##
@@ -94,8 +94,11 @@ compare_scenarios <- function(df, score_a, score_b, direction_benchmark, year_re
       change_b = !!score_b_sym - !!year_ref_sym,
       
       # Step 2: Determine the direction of change
-      direction_a = if_else(change_a > 0, "Positive", "Negative"),
-      direction_b = if_else(change_b > 0, "Positive", "Negative"),
+      direction_a = if_else(change_a > 0, "Positive", 
+                            if_else(change_a < 0, "Negative", "No change")),
+      
+      direction_b = if_else(change_b > 0, "Positive", 
+                            if_else(change_b < 0, "Negative", "No change")),
       
       # Step 3: Flag whether the change is "big" (absolute value > 0.05)
       big_change_a = if_else(abs(change_a) > 0.05, "Yes", "No"),
@@ -228,5 +231,78 @@ compare_stages <- function(
       )
     ) %>%
     ungroup()
+}
+
+### Proportions_data -----------------------------------------------------------------------
+
+# This function prepares summarized data for proportional bar charts.
+#
+# Args:
+#   data: A data.frame containing the original data.
+#   category_var: A string with the name of the categorical variable to group by (e.g., "diff_cat").
+#   levels_order: A character vector specifying the desired order of the factor levels.
+#
+# Returns:
+#   A summarized data.frame with the percentage proportion of each category
+#   and the categorical variable converted into a factor with ordered levels.
+
+proportions_data <- function(data, category_var, levels_order) {
+  data %>%
+    # Count the number of occurrences per category
+    count(!!sym(category_var)) %>%
+    
+    # Drop rows where the category variable is NA
+    drop_na() %>%
+    
+    # Compute the proportion and convert the variable to a factor with the desired order
+    mutate(
+      proportion = round(n / sum(n) * 100, 2),
+      !!category_var := factor(!!sym(category_var), levels = levels_order)
+    )
+}
+
+### Bars plot function -----------------------------------------------------------------------
+
+# This function generates a proportional bar chart using ggplot2.
+#
+# Args:
+#   data: A data.frame prepared by the proportions_data() function.
+#   category_var: A string with the name of the categorical variable to be used on the x-axis.
+#
+# Returns:
+#   A ggplot object representing the bar chart with percentage labels.
+
+plot_bar <- function(data, category_var, title) {
+  ggplot(data, aes(
+    x     = !!sym(category_var),         # Set the x-axis variable dynamically
+    y     = proportion,                  # Use the calculated proportions as the y-axis
+    label = paste0(proportion, "%")      # Create percentage labels for the bars
+  )) +
+    geom_col(                            # Create the bars
+      alpha  = 0.5,                      # Set transparency
+      colour = "white",                  # White border for bars
+      fill   = "#0072B2"                 # Fill color
+    ) +
+    geom_text(                           # Add text labels above bars
+      size  = 2.81,
+      vjust = -1
+    ) +
+    scale_y_continuous(                 # Define y-axis scale
+      breaks = seq(0, 100, 10),         # Breaks every 10%
+      limits = c(0, 100)                # Limit to 0–100%
+    ) +
+    labs(                               # Empty axis labels (customizable)
+      y = " ",
+      x = " ",
+      title = title
+    ) +
+    theme(                              # Customize the appearance
+      axis.ticks       = element_blank(),
+      plot.margin      = unit(c(2.5, 7.5, 7.5, 2.5), "mm"),
+      panel.background = element_rect(fill = "white"),
+      panel.grid.major = element_line(size = 0.5, colour = "grey93"),
+      panel.grid.minor = element_blank(),
+      legend.position  = "top"
+    )
 }
 
