@@ -57,6 +57,7 @@ qrq_country_counts <- read_dta("1. Data/2. Scenarios/country_counts_s0.dta") %>%
 
 # Combine scenarios into one long dataset
 qrq_scenarios <- raw_qrq_data %>%
+  #filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")) %>%
   left_join(qrq_s1, by = c("country", "variables")) %>%
   left_join(qrq_s2, by = c("country", "variables")) %>%
   left_join(qrq_s3_n, by = c("country", "variables")) %>%
@@ -70,10 +71,27 @@ qrq_scenarios <- raw_qrq_data %>%
 # Load benchmark: long experts' direction (internal benchmark)
 
 qrq_long_2023 <- read_dta("1. Data/3. Final/qrq_long_2023_country_averages.dta") %>%
-  select(country, f_1 = f_1_2023, f_2 = f_2_2023, f_3 = f_3_2023, f_4 = f_4_2023, f_5 = f_5_2023, f_6 = f_6_2023, f_7 = f_7_2023, f_8 = f_8_2023, ROLI = ROLI_2023) %>%
+  select(country, 
+         f_1 = f_1_2023, f_1_2 = f_1_2_2023, f_1_3 = f_1_3_2023, f_1_4 = f_1_4_2023, f_1_5 = f_1_5_2023, f_1_6 = f_1_6_2023, f_1_7 = f_1_7_2023,
+         f_2 = f_2_2023, f_2_1 = f_2_1_2023, f_2_2 = f_2_2_2023, f_2_3 = f_2_3_2023, f_2_4 = f_2_4_2023,
+         f_3 = f_3_2023, f_3_1 = f_3_1_2023, f_3_2 = f_3_2_2023, f_3_3 = f_3_3_2023, f_3_4 = f_3_4_2023,
+         f_4 = f_4_2023, f_4_1 = f_4_1_2023, f_4_2 = f_4_2_2023, f_4_3 = f_4_3_2023, f_4_4 = f_4_4_2023, f_4_5 = f_4_5_2023, f_4_6 = f_4_6_2023, f_4_7 = f_4_7_2023, f_4_8 = f_4_8_2023,
+         f_6 = f_6_2023, f_6_1 = f_6_1_2023, f_6_2 = f_6_2_2023, f_6_3 = f_6_3_2023, f_6_4 = f_6_4_2023, f_6_5 = f_6_5_2023,
+         f_7 = f_7_2023, f_7_1 = f_7_1_2023, f_7_2 = f_7_2_2023, f_7_3 = f_7_3_2023, f_7_4 = f_7_4_2023, f_7_5 = f_7_5_2023, f_7_6 = f_7_6_2023, f_7_7 = f_7_7_2023,
+         f_8 = f_8_2023, f_8_1 = f_8_1_2023, f_8_2 = f_8_2_2023, f_8_3 = f_8_3_2023, f_8_4 = f_8_4_2023, f_8_5 = f_8_5_2023, f_8_6 = f_8_6_2023, f_8_7 = f_8_7_2023, 
+         ROLI = ROLI_2023) %>%
   pivot_longer(cols = !c(country), names_to = "variables", values_to = "long_2023")
+
 qrq_long_2024 <- read_dta("1. Data/3. Final/qrq_long_2024_country_averages.dta") %>%
-  select(country, f_1 = f_1_2024, f_2 = f_2_2024, f_3 = f_3_2024, f_4 = f_4_2024, f_5 = f_5_2024, f_6 = f_6_2024, f_7 = f_7_2024, f_8 = f_8_2024, ROLI = ROLI_2024) %>%
+  select(country, 
+         f_1 = f_1_2024, f_1_2 = f_1_2_2024, f_1_3 = f_1_3_2024, f_1_4 = f_1_4_2024, f_1_5 = f_1_5_2024, f_1_6 = f_1_6_2024, f_1_7 = f_1_7_2024,
+         f_2 = f_2_2024, f_2_1 = f_2_1_2024, f_2_2 = f_2_2_2024, f_2_3 = f_2_3_2024, f_2_4 = f_2_4_2024,
+         f_3 = f_3_2024, f_3_1 = f_3_1_2024, f_3_2 = f_3_2_2024, f_3_3 = f_3_3_2024, f_3_4 = f_3_4_2024,
+         f_4 = f_4_2024, f_4_1 = f_4_1_2024, f_4_2 = f_4_2_2024, f_4_3 = f_4_3_2024, f_4_4 = f_4_4_2024, f_4_5 = f_4_5_2024, f_4_6 = f_4_6_2024, f_4_7 = f_4_7_2024, f_4_8 = f_4_8_2024,
+         f_6 = f_6_2024, f_6_1 = f_6_1_2024, f_6_2 = f_6_2_2024, f_6_3 = f_6_3_2024, f_6_4 = f_6_4_2024, f_6_5 = f_6_5_2024,
+         f_7 = f_7_2024, f_7_1 = f_7_1_2024, f_7_2 = f_7_2_2024, f_7_3 = f_7_3_2024, f_7_4 = f_7_4_2024, f_7_5 = f_7_5_2024, f_7_6 = f_7_6_2024, f_7_7 = f_7_7_2024,
+         f_8 = f_8_2024, f_8_1 = f_8_1_2024, f_8_2 = f_8_2_2024, f_8_3 = f_8_3_2024, f_8_4 = f_8_4_2024, f_8_5 = f_8_5_2024, f_8_6 = f_8_6_2024, f_8_7 = f_8_7_2024, 
+         ROLI = ROLI_2024) %>%
   pivot_longer(cols = !c(country), names_to = "variables", values_to = "long_2024")
 
 qrq_benchmark <- qrq_long_2023 %>%
@@ -191,6 +209,126 @@ qrq_final <- compare_stages(
     scores_2023, scores_2024, scores_change, total_counts, match_stage_a_b
   )
 
+### Subfactor data --------------------------------------
+
+qrq_final_subfactors <- qrq_final %>%
+  select(country, variables, long_direction, scenario_final, scores_final, total_counts) %>%
+  full_join(qrq_s1, by = c("country", "variables")) %>%
+  full_join(qrq_s2, by = c("country", "variables")) %>%
+  full_join(qrq_s3_n, by = c("country", "variables")) %>%
+  full_join(qrq_s3_p, by = c("country", "variables")) %>%
+  full_join(qrq_s4_n, by = c("country", "variables")) %>%
+  full_join(qrq_s4_p, by = c("country", "variables")) %>%
+  full_join(qrq_scores_2023, by = c("country", "variables")) %>%
+  left_join(qrq_scores_2024, by = c("country", "variables"))
+  
+writexl::write_xlsx(qrq_final_subfactors, path = "prueba.xlsx")
+
+# Define base variables and columns to replicate
+base_vars <- c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")
+cols_to_copy <- c("long_direction", "scenario_final", "total_counts")
+
+# Loop over each base variable
+for (base in base_vars) {
+  # Get reference rows
+  ref_data <- qrq_final_subfactors %>%
+    filter(variables == base) %>%
+    select(country, all_of(cols_to_copy)) %>%
+    rename_with(~ paste0("ref_", .), all_of(cols_to_copy))
+  
+  # Merge and update values for matching prefixed variables
+  qrq_final_subfactors <- qrq_final_subfactors %>%
+    left_join(ref_data, by = "country") %>%
+    mutate(across(all_of(cols_to_copy),
+                  ~ if_else(grepl(paste0("^", base, "_"), variables),
+                            get(paste0("ref_", cur_column())),
+                            .))) %>%
+    select(-starts_with("ref_")) %>%
+    filter(variables != "ROLI")
+}
+
+qrq_final_subfactors <- qrq_final_subfactors %>%
+  mutate(
+    scores_final_factor =
+      case_when(
+        scenario_final %in% "Scenario 1" ~ scores_s1,
+        scenario_final %in% "Scenario 2" ~ scores_s2,
+        scenario_final %in% "Scenario 3" & long_direction %in% "Positive" ~ scores_s3_n,
+        scenario_final %in% "Scenario 3" & long_direction %in% "Negative" ~ scores_s3_p,
+        scenario_final %in% "Scenario 4" & long_direction %in% "Positive" ~ scores_s4_n,
+        scenario_final %in% "Scenario 4" & long_direction %in% "Negative" ~ scores_s4_p,
+        T ~ scores_final
+      )
+  )
+
+factors_avg <- qrq_final_subfactors %>%
+  mutate(
+    factor = 
+      case_when(
+        str_detect(variables, "f_1_") ~ "f_1",
+        str_detect(variables, "f_2_") ~ "f_2",
+        str_detect(variables, "f_3_") ~ "f_3",
+        str_detect(variables, "f_4_") ~ "f_4",
+        str_detect(variables, "f_6_") ~ "f_6",
+        str_detect(variables, "f_7_") ~ "f_7",
+        str_detect(variables, "f_8_") ~ "f_8"
+      )
+  ) %>%
+  group_by(country, factor) %>%
+  mutate(
+    factor_score = mean(scores_final, na.rm = T)
+  ) %>%
+  ungroup() %>%
+  drop_na(factor) %>%
+  select(country, variables = factor, factor_score) %>%
+  unique() 
+
+qrq_subfactors_final <- qrq_final_subfactors %>%
+  left_join(factors_avg, by = c("country", "variables")) %>%
+  mutate(
+    scores_final =
+      case_when(
+        variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8") ~ factor_score,
+        T ~ scores_final
+      )
+  ) %>%
+  select(country, variables, scores_final_subfactor = scores_final, scores_final_factor, 
+         scores_2023, scores_2024,
+         total_counts, scores_s1, scores_s2, scores_s3_n, scores_s3_p, scores_s4_n, scores_s4_p,
+         long_direction, scenario_final_factor = scenario_final) %>%
+  mutate(
+    diff_subfactor     = abs(scores_2024 - scores_final_subfactor),
+    diff_factor        = abs(scores_2024 - scores_final_factor),
+    best_scores        = 
+      case_when(
+        diff_subfactor < diff_factor ~ "diff_subfactor",
+        diff_subfactor > diff_factor ~ "diff_factor",
+        diff_subfactor == diff_factor ~ "same"
+      ),
+    change_subfactor    = scores_2023 - scores_final_subfactor,
+    change_factor       = scores_2023 - scores_final_factor,
+    direction_subfactor = 
+      case_when(
+        change_subfactor > 0 ~ "Positive",
+        change_subfactor < 0 ~ "Negative",
+        change_subfactor == 0 ~ "No change"
+      ),
+    direction_factor = 
+      case_when(
+        change_factor > 0 ~ "Positive",
+        change_factor < 0 ~ "Negative",
+        change_factor == 0 ~ "No change"
+      )
+  ) %>%
+  mutate(
+    scores_change = scores_2023 - scores_2024,
+    scores_direction = case_when(
+      scores_change < 0 ~ "Negative",
+      scores_change > 0 ~ "Positive",
+      scores_change == 0 ~ "No change"
+    )
+  )
+
 ## +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ##
 ## 4.  Data Analysis                                                                                     ----
@@ -199,39 +337,42 @@ qrq_final <- compare_stages(
 
 "%!in%" <- compose("!", "%in%")
 
-qrq_scores_analysis <- qrq_final %>%
-  filter(variables %!in% "f_5") %>%
-  filter(variables %!in% "ROLI") %>%
+qrq_scores_analysis <- qrq_subfactors_final %>%
   mutate(
-    diff_qrq_raw = scores_2024 - scores_final,
-    diff_qrq = abs(diff_qrq_raw),
     level = case_when(
       total_counts < 41 ~ "3. Low counts",
       total_counts >= 41 & total_counts < 61 ~ "2. Medium counts",
       total_counts >= 61 ~ "1. High counts"
     ),
-    diff_cat = case_when(
-      diff_qrq == 0                      ~ "No differences",
-      diff_qrq > 0 & diff_qrq < 0.01     ~ "Differences below 0.01",
-      diff_qrq >= 0.01 & diff_qrq < 0.05 ~ "Differences between 0.01 and 0.05",
-      diff_qrq >= 0.05 & diff_qrq < 0.1  ~ "Differences between 0.05 and 0.1",
-      diff_qrq >= 0.1                    ~ "Differences above 0.1"
+    diff_factor_cat = case_when(
+      diff_factor == 0                         ~ "No differences",
+      diff_factor > 0 & diff_factor < 0.01     ~ "Differences below 0.01",
+      diff_factor >= 0.01 & diff_factor < 0.05 ~ "Differences between 0.01 and 0.05",
+      diff_factor >= 0.05 & diff_factor < 0.1  ~ "Differences between 0.05 and 0.1",
+      diff_factor >= 0.1                       ~ "Differences above 0.1"
     ),
-    scores_direction = case_when(
-      scores_change < 0 ~ "Negative",
-      scores_change > 0 ~ "Positive",
-      scores_change == 0 ~ "No change"
+    diff_factor_direction = case_when(
+      direction_factor == scores_direction ~ "Same direction",
+      direction_factor != scores_direction ~ "Different direction",
+      T ~ "Review"
     ),
-    diff_direction = case_when(
-      scores_direction_final == scores_direction ~ "Same direction",
-      scores_direction_final != scores_direction ~ "Different direction",
+    diff_subfactor_cat = case_when(
+      diff_subfactor == 0                         ~ "No differences",
+      diff_subfactor > 0 & diff_subfactor < 0.01     ~ "Differences below 0.01",
+      diff_subfactor >= 0.01 & diff_subfactor < 0.05 ~ "Differences between 0.01 and 0.05",
+      diff_subfactor >= 0.05 & diff_subfactor < 0.1  ~ "Differences between 0.05 and 0.1",
+      diff_subfactor >= 0.1                       ~ "Differences above 0.1"
+    ),
+    diff_subfactor_direction = case_when(
+      direction_subfactor == scores_direction ~ "Same direction",
+      direction_subfactor != scores_direction ~ "Different direction",
       T ~ "Review"
     )
   ) %>%
   group_by(variables) %>%
   mutate(
     scores_2024_ranking  = rank(-scores_2024),
-    scores_final_ranking = rank(-scores_final),
+    scores_final_ranking = rank(-scores_final_factor),
     diff_ranking = abs(scores_2024_ranking - scores_final_ranking),
   ) %>%
   ungroup() %>%
@@ -268,22 +409,22 @@ ggsave(plot = p_diff_ranking,
 
 #### Scenarios
 
-scenario_levels <- c(
-  "Scenario 1",
-  "Scenario 2",
-  "Scenario 3",
-  "Scenario 4"
-)
-
-data_scenarios  <- proportions_data(qrq_scores_analysis, "scenario_final", scenario_levels)
-p_scenarios     <- plot_bar(data_scenarios, 
-                            "scenario_final",
-                            "Scenarios 2024");p_scenarios
-
-ggsave(plot = p_scenarios, 
-       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_scenarios.svg"),
-       width = 10,
-       height = 7)
+# scenario_levels <- c(
+#   "Scenario 1",
+#   "Scenario 2",
+#   "Scenario 3",
+#   "Scenario 4"
+# )
+# 
+# data_scenarios  <- proportions_data(qrq_scores_analysis, "scenario_final_factor", scenario_levels)
+# p_scenarios     <- plot_bar(data_scenarios, 
+#                             "scenario_final",
+#                             "Scenarios 2024");p_scenarios
+# 
+# ggsave(plot = p_scenarios, 
+#        filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_scenarios.svg"),
+#        width = 10,
+#        height = 7)
 
 #### Differences
 
@@ -295,9 +436,9 @@ diff_levels <- c(
   "Differences above 0.1"
 )
 
-data_diff       <- proportions_data(qrq_scores_analysis, "diff_cat", diff_levels)
+data_diff       <- proportions_data(qrq_scores_analysis %>% filter(level %in% c("1. High counts","2. Medium counts")), "diff_factor_cat", diff_levels)
 p_differences   <- plot_bar(data_diff, 
-                            "diff_cat",
+                            "diff_factor_cat",
                             "Distribution of differences 2024");p_differences
 
 ggsave(plot = p_differences, 
@@ -312,9 +453,9 @@ direction_levels <- c(
   "Different direction"
 )
 
-data_direction  <- proportions_data(qrq_scores_analysis, "diff_direction", direction_levels)
+data_direction  <- proportions_data(qrq_scores_analysis, "diff_factor_direction", direction_levels)
 p_direction     <- plot_bar(data_direction, 
-                            "diff_direction",
+                            "diff_factor_direction",
                             "Differences in the direction 2024");p_direction
 
 ggsave(plot = p_direction, 
@@ -323,65 +464,65 @@ ggsave(plot = p_direction,
        height = 7)
 
 ### Averages analysis ------------------------------------------------------
-
-data_diff_factor <- qrq_scores_analysis %>%
-  group_by(variables) %>%
-  summarise(avg_diff = mean(diff_qrq, na.rm = T))
-
-print(data_diff_factor)
-
-data_diff_level <- qrq_scores_analysis %>%
-  group_by(level) %>%
-  summarise(avg_diff = mean(diff_qrq, na.rm = T))
-
-print(data_diff_level)
-
-### Ranking analysis ------------------------------------------------------
-
-data_diff_factor_ranking <- qrq_scores_analysis %>%
-  group_by(variables) %>%
-  summarise(avg_diff = mean(diff_ranking, na.rm = T))
-
-print(data_diff_factor_ranking)
-
-data_diff_level_ranking <- qrq_scores_analysis %>%
-  group_by(level) %>%
-  summarise(avg_diff = mean(diff_ranking, na.rm = T))
-
-print(data_diff_level_ranking)
-
-### Direction analysis ------------------------------------------------------
-
-data_diff_direction <- qrq_scores_analysis %>%
-  group_by(diff_direction) %>%
-  summarise(avg_diff = mean(diff_qrq, na.rm = T))
-
-print(data_diff_direction)
-
-data_diff_direction_ranking <- qrq_scores_analysis %>%
-  group_by(diff_direction) %>%
-  summarise(avg_diff = mean(diff_ranking, na.rm = T))
-
-print(data_diff_direction_ranking)
-
-data_diff_direction_ranking <- qrq_scores_analysis %>%
-  group_by(diff_direction) %>%
-  summarise(avg_diff = mean(diff_ranking, na.rm = T))
-
-print(data_diff_direction_ranking)
-
-### Direction diff analysis ------------------------------------------------------
-
-qrq_negative <- qrq_scores_analysis %>%
-  filter(scores_direction_final %in% "Negative") %>%
-  summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
-            avg_diff_scores = mean(scores_change, na.rm = T))
-
-print(qrq_negative)
-
-qrq_positive <- qrq_scores_analysis %>%
-  filter(scores_direction_final %in% "Positive") %>%
-  summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
-            avg_diff_scores = mean(scores_change, na.rm = T))
-
-print(qrq_positive)
+# 
+# data_diff_factor <- qrq_scores_analysis %>%
+#   group_by(variables) %>%
+#   summarise(avg_diff = mean(diff_qrq, na.rm = T))
+# 
+# print(data_diff_factor)
+# 
+# data_diff_level <- qrq_scores_analysis %>%
+#   group_by(level) %>%
+#   summarise(avg_diff = mean(diff_qrq, na.rm = T))
+# 
+# print(data_diff_level)
+# 
+# ### Ranking analysis ------------------------------------------------------
+# 
+# data_diff_factor_ranking <- qrq_scores_analysis %>%
+#   group_by(variables) %>%
+#   summarise(avg_diff = mean(diff_ranking, na.rm = T))
+# 
+# print(data_diff_factor_ranking)
+# 
+# data_diff_level_ranking <- qrq_scores_analysis %>%
+#   group_by(level) %>%
+#   summarise(avg_diff = mean(diff_ranking, na.rm = T))
+# 
+# print(data_diff_level_ranking)
+# 
+# ### Direction analysis ------------------------------------------------------
+# 
+# data_diff_direction <- qrq_scores_analysis %>%
+#   group_by(diff_direction) %>%
+#   summarise(avg_diff = mean(diff_qrq, na.rm = T))
+# 
+# print(data_diff_direction)
+# 
+# data_diff_direction_ranking <- qrq_scores_analysis %>%
+#   group_by(diff_direction) %>%
+#   summarise(avg_diff = mean(diff_ranking, na.rm = T))
+# 
+# print(data_diff_direction_ranking)
+# 
+# data_diff_direction_ranking <- qrq_scores_analysis %>%
+#   group_by(diff_direction) %>%
+#   summarise(avg_diff = mean(diff_ranking, na.rm = T))
+# 
+# print(data_diff_direction_ranking)
+# 
+# ### Direction diff analysis ------------------------------------------------------
+# 
+# qrq_negative <- qrq_scores_analysis %>%
+#   filter(scores_direction_final %in% "Negative") %>%
+#   summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
+#             avg_diff_scores = mean(scores_change, na.rm = T))
+# 
+# print(qrq_negative)
+# 
+# qrq_positive <- qrq_scores_analysis %>%
+#   filter(scores_direction_final %in% "Positive") %>%
+#   summarise(avg_diff_final = mean(scores_change_final, na.rm = T),
+#             avg_diff_scores = mean(scores_change, na.rm = T))
+# 
+# print(qrq_positive)

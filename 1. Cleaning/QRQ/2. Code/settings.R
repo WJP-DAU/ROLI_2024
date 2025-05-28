@@ -55,7 +55,15 @@ if (Sys.info()["user"] == "santiagopardo") {
 
 load_scenario <- function(file, value_name) {
   read_dta(file) %>%
-    select(country, f_1:f_8, ROLI) %>%
+    select(country, 
+           f_1, f_1_2, f_1_3, f_1_4, f_1_5, f_1_6, f_1_7,
+           f_2, f_2_1, f_2_2, f_2_3, f_2_4,
+           f_3, f_3_1, f_3_2, f_3_3, f_3_4,
+           f_4, f_4_1, f_4_2, f_4_3, f_4_4, f_4_5, f_4_6, f_4_7, f_4_8,
+           f_6, f_6_1, f_6_2, f_6_3, f_6_4, f_6_5,
+           f_7, f_7_1, f_7_2, f_7_3, f_7_4, f_7_5, f_7_6, f_7_7,
+           f_8, f_8_1, f_8_2, f_8_3, f_8_4, f_8_5, f_8_6, f_8_7,
+           ROLI) %>%
     pivot_longer(cols = -country, names_to = "variables", values_to = value_name)
 }
 
