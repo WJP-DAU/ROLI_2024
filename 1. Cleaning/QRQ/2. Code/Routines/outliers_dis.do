@@ -25,6 +25,11 @@ foreach x in cc cj lb ph {
 	replace outlier_`x'_hi=1 if total_score>=(total_score_mean_qrq+2.5*total_score_sd_qrq) & total_score!=. & question=="`x'"
 }
 
+****** Min-max values
+
+*bysort country question: egen total_score_qrq_max=max(total_score)
+*bysort country question: egen total_score_qrq_min=min(total_score)
+
 
 ****** IQR 
 
@@ -53,7 +58,4 @@ replace outlier_qrq_iqr=1 if total_score>=(total_score_qrq_q3+1.5*total_score_qr
 replace outlier_qrq_iqr=1 if total_score<=(total_score_qrq_q1-1.5*total_score_qrq_iqr) & total_score~=.
 */
 
-****** Min-max values
 
-bysort country question: egen total_score_qrq_max=max(total_score)
-bysort country question: egen total_score_qrq_min=min(total_score)
