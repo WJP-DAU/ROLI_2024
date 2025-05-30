@@ -107,6 +107,7 @@ qrq_benchmark <- qrq_long_2023 %>%
 # Load official QRQ scores
 qrq_scores_2023 <- load_scenario("1. Data/3. Final/qrq_country_averages_2023.dta", "scores_2023")
 qrq_scores_2024 <- load_scenario("1. Data/3. Final/qrq_country_averages_2024.dta", "scores_2024")
+qrq_scores_2024_int <- load_scenario("1. Data/3. Final/qrq_country_averages_2024_int.dta", "scores_2024_int")
 
 qrq_scores_change <- qrq_scores_2023 %>%
   left_join(qrq_scores_2024, by = c("country", "variables")) %>%
@@ -220,7 +221,8 @@ qrq_final_subfactors <- qrq_final %>%
   full_join(qrq_s4_n, by = c("country", "variables")) %>%
   full_join(qrq_s4_p, by = c("country", "variables")) %>%
   full_join(qrq_scores_2023, by = c("country", "variables")) %>%
-  left_join(qrq_scores_2024, by = c("country", "variables"))
+  full_join(qrq_scores_2024, by = c("country", "variables")) %>%
+  full_join(qrq_scores_2024_int, by = c("country", "variables"))
   
 writexl::write_xlsx(qrq_final_subfactors, path = "prueba.xlsx")
 
@@ -293,13 +295,21 @@ qrq_subfactors_final <- qrq_final_subfactors %>%
       )
   ) %>%
   select(country, variables, scores_final_subfactor = scores_final, scores_final_factor, 
-         scores_2023, scores_2024,
+         scores_2023, scores_2024, scores_2024_int,
          total_counts, scores_s1, scores_s2, scores_s3_n, scores_s3_p, scores_s4_n, scores_s4_p,
-         long_direction, scenario_final_factor = scenario_final) %>%
+         long_direction, scenario_final_factor = scenario_final, long_direction) %>%
   mutate(
     diff_subfactor     = abs(scores_2024 - scores_final_subfactor),
     diff_factor        = abs(scores_2024 - scores_final_factor),
     best_scores        = 
+      case_when(
+        diff_subfactor < diff_factor ~ "diff_subfactor",
+        diff_subfactor > diff_factor ~ "diff_factor",
+        diff_subfactor == diff_factor ~ "same"
+      ),
+    diff_subfactor_int     = abs(scores_2024_int - scores_final_subfactor),
+    diff_factor_int        = abs(scores_2024_int - scores_final_factor),
+    best_scores_int        = 
       case_when(
         diff_subfactor < diff_factor ~ "diff_subfactor",
         diff_subfactor > diff_factor ~ "diff_factor",
@@ -326,6 +336,12 @@ qrq_subfactors_final <- qrq_final_subfactors %>%
       scores_change < 0 ~ "Negative",
       scores_change > 0 ~ "Positive",
       scores_change == 0 ~ "No change"
+    ),
+    scores_change_int = scores_2023 - scores_2024_int,
+    scores_direction_int = case_when(
+      scores_change_int < 0 ~ "Negative",
+      scores_change_int > 0 ~ "Positive",
+      scores_change_int == 0 ~ "No change"
     )
   )
 
@@ -351,10 +367,22 @@ qrq_scores_analysis <- qrq_subfactors_final %>%
       diff_factor >= 0.05 & diff_factor < 0.1  ~ "Differences between 0.05 and 0.1",
       diff_factor >= 0.1                       ~ "Differences above 0.1"
     ),
+    diff_factor_cat_int = case_when(
+      diff_factor_int == 0                         ~ "No differences",
+      diff_factor_int > 0 & diff_factor_int < 0.01     ~ "Differences below 0.01",
+      diff_factor_int >= 0.01 & diff_factor_int < 0.05 ~ "Differences between 0.01 and 0.05",
+      diff_factor_int >= 0.05 & diff_factor_int < 0.1  ~ "Differences between 0.05 and 0.1",
+      diff_factor_int >= 0.1                       ~ "Differences above 0.1"
+    ),
     diff_factor_direction = case_when(
       direction_factor == scores_direction ~ "Same direction",
       direction_factor != scores_direction ~ "Different direction",
-      T ~ "Review"
+      T ~ NA_character_
+    ),
+    diff_factor_direction_int = case_when(
+      direction_factor == scores_direction_int ~ "Same direction",
+      direction_factor != scores_direction_int ~ "Different direction",
+      T ~ NA_character_
     ),
     diff_subfactor_cat = case_when(
       diff_subfactor == 0                         ~ "No differences",
@@ -366,46 +394,131 @@ qrq_scores_analysis <- qrq_subfactors_final %>%
     diff_subfactor_direction = case_when(
       direction_subfactor == scores_direction ~ "Same direction",
       direction_subfactor != scores_direction ~ "Different direction",
-      T ~ "Review"
+      T ~ NA_character_
     )
-  ) %>%
-  group_by(variables) %>%
-  mutate(
-    scores_2024_ranking  = rank(-scores_2024),
-    scores_final_ranking = rank(-scores_final_factor),
-    diff_ranking = abs(scores_2024_ranking - scores_final_ranking),
-  ) %>%
-  ungroup() %>%
-  mutate(
-    diff_ranking_cat = case_when(
-      diff_ranking == 0                      ~ "No differences",
-      diff_ranking > 0 & diff_ranking < 5    ~ "Differences between 1 and 5",
-      diff_ranking >= 5 & diff_ranking < 10  ~ "Differences between 5 and 10",
-      diff_ranking >= 10 & diff_ranking < 20 ~ "Differences between 10 and 20",
-      diff_ranking >= 20                     ~ "Differences above 20")
   )
+  # ) %>%
+  # group_by(variables) %>%
+  # mutate(
+  #   scores_2024_ranking  = rank(-scores_2024),
+  #   scores_final_ranking = rank(-scores_final_factor),
+  #   diff_ranking = abs(scores_2024_ranking - scores_final_ranking),
+  # ) %>%
+  # ungroup() %>%
+  # mutate(
+  #   diff_ranking_cat = case_when(
+  #     diff_ranking == 0                      ~ "No differences",
+  #     diff_ranking > 0 & diff_ranking < 5    ~ "Differences between 1 and 5",
+  #     diff_ranking >= 5 & diff_ranking < 10  ~ "Differences between 5 and 10",
+  #     diff_ranking >= 10 & diff_ranking < 20 ~ "Differences between 10 and 20",
+  #     diff_ranking >= 20                     ~ "Differences above 20")
+  # )
 
 ### Proportions analysis ------------------------------------------------------
 
-#### Rankings
+#### Differences
 
-diff_rankings <- c(
+diff_levels <- c(
   "No differences",
-  "Differences between 1 and 5",
-  "Differences between 5 and 10",
-  "Differences between 10 and 20",
-  "Differences above 20"
+  "Differences below 0.01",
+  "Differences between 0.01 and 0.05",
+  "Differences between 0.05 and 0.1",
+  "Differences above 0.1"
 )
 
-data_rankings   <- proportions_data(qrq_scores_analysis, "diff_ranking_cat", diff_rankings)
-p_diff_ranking  <- plot_bar(data_rankings, 
-                            "diff_ranking_cat",
-                            "Rankings differences 2024");p_diff_ranking
+data_diff       <- proportions_data(qrq_scores_analysis %>% 
+                                      filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")),
+                                    "diff_factor_cat", diff_levels)
+p_differences   <- plot_bar(data_diff, 
+                            "diff_factor_cat",
+                            "Distribution of differences 2024");p_differences
 
-ggsave(plot = p_diff_ranking, 
-       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_ranking.svg"),
+data_diff       <- proportions_data(qrq_scores_analysis %>% 
+                                      filter(variables %!in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")),
+                                    "diff_subfactor_cat", diff_levels)
+p_differences   <- plot_bar(data_diff, 
+                            "diff_subfactor_cat",
+                            "Distribution of differences 2024");p_differences
+
+data_diff       <- proportions_data(qrq_scores_analysis %>% 
+                                      filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")), 
+                                    "diff_factor_cat_int", diff_levels)
+p_differences   <- plot_bar(data_diff, 
+                            "diff_factor_cat_int",
+                            "Distribution of differences 2024");p_differences
+
+ggsave(plot = p_differences, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_levels.svg"),
        width = 10,
        height = 7)
+
+#### Directions
+
+direction_levels <- c(
+  "Same direction",
+  "Different direction"
+)
+
+data_direction  <- proportions_data(qrq_scores_analysis %>% 
+                                      filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")), 
+                                    "diff_factor_direction", direction_levels) %>% drop_na()
+p_direction     <- plot_bar(data_direction, 
+                            "diff_factor_direction",
+                            "Differences in the direction 2024");p_direction
+
+data_direction  <- proportions_data(qrq_scores_analysis %>% 
+                                      filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")), 
+                                    "diff_subfactor_direction", direction_levels) %>% drop_na()
+p_direction     <- plot_bar(data_direction, 
+                            "diff_subfactor_direction",
+                            "Differences in the direction 2024");p_direction
+
+data_direction  <- proportions_data(qrq_scores_analysis%>% 
+                                      filter(variables %!in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")),
+                                    "diff_factor_direction_int", direction_levels) %>% drop_na()
+p_direction     <- plot_bar(data_direction, 
+                            "diff_factor_direction_int",
+                            "Differences in the direction 2024");p_direction
+
+ggsave(plot = p_direction, 
+       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_direction.svg"),
+       width = 10,
+       height = 7)
+
+direction_counts <- qrq_scores_analysis%>% 
+  filter(variables %!in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")) %>%
+  group_by(level) %>%
+  # Count the number of occurrences per category
+  count(diff_factor_direction) %>%
+  
+  # Drop rows where the category variable is NA
+  drop_na() %>%
+  
+  # Compute the proportion and convert the variable to a factor with the desired order
+  mutate(
+    proportion = round(n / sum(n) * 100, 2),
+    category_var := factor(diff_factor_direction, levels = direction_levels)
+  )
+
+#### Rankings
+
+# diff_rankings <- c(
+#   "No differences",
+#   "Differences between 1 and 5",
+#   "Differences between 5 and 10",
+#   "Differences between 10 and 20",
+#   "Differences above 20"
+# )
+# 
+# data_rankings   <- proportions_data(qrq_scores_analysis, "diff_ranking_cat", diff_rankings)
+# p_diff_ranking  <- plot_bar(data_rankings, 
+#                             "diff_ranking_cat",
+#                             "Rankings differences 2024");p_diff_ranking
+# 
+# ggsave(plot = p_diff_ranking, 
+#        filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_ranking.svg"),
+#        width = 10,
+#        height = 7)
 
 #### Scenarios
 
@@ -426,42 +539,6 @@ ggsave(plot = p_diff_ranking,
 #        width = 10,
 #        height = 7)
 
-#### Differences
-
-diff_levels <- c(
-  "No differences",
-  "Differences below 0.01",
-  "Differences between 0.01 and 0.05",
-  "Differences between 0.05 and 0.1",
-  "Differences above 0.1"
-)
-
-data_diff       <- proportions_data(qrq_scores_analysis %>% filter(level %in% c("1. High counts","2. Medium counts")), "diff_factor_cat", diff_levels)
-p_differences   <- plot_bar(data_diff, 
-                            "diff_factor_cat",
-                            "Distribution of differences 2024");p_differences
-
-ggsave(plot = p_differences, 
-       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_levels.svg"),
-       width = 10,
-       height = 7)
-
-#### Directions
-
-direction_levels <- c(
-  "Same direction",
-  "Different direction"
-)
-
-data_direction  <- proportions_data(qrq_scores_analysis, "diff_factor_direction", direction_levels)
-p_direction     <- plot_bar(data_direction, 
-                            "diff_factor_direction",
-                            "Differences in the direction 2024");p_direction
-
-ggsave(plot = p_direction, 
-       filename = paste0(path2DA, "/3. Outputs/Charts/", "p_diff_direction.svg"),
-       width = 10,
-       height = 7)
 
 ### Averages analysis ------------------------------------------------------
 # 
