@@ -191,7 +191,7 @@ drop if tail_lb==1 & lb_total_new>=15
 drop if tail_ph==1 & ph_total_new>=15
 
 *----- Dropping variables no longer needed
-*drop count_cc count_cj count_lb count_ph cc_total cj_total lb_total ph_total tail_cc tail_cj tail_lb tail_ph cc_total_tail cj_total_tail lb_total_tail ph_total_tail new_cc new_cj new_lb new_ph cc_total_new cj_total_new lb_total_new ph_total_new percentage_tail_cc percentage_tail_cj percentage_tail_lb percentage_tail_ph
+drop cc_total cj_total lb_total ph_total tail_cc tail_cj tail_lb tail_ph cc_total_tail cj_total_tail lb_total_tail ph_total_tail new_cc new_cj new_lb new_ph cc_total_new cj_total_new lb_total_new ph_total_new percentage_tail_cc percentage_tail_cj percentage_tail_lb percentage_tail_ph
 
 /*=================================================================================================================
 					                 5. Outliers
