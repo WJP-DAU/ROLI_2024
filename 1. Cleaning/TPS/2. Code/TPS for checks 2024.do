@@ -869,8 +869,15 @@ br
 
 *foreach var of varlist bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr bti_civil cpi ewf_judicialindependence ewf_impartialcourts ewf_prop ewf_military ewf_legalsystemintegrity ewf_contracts ewf_police ewf_collectivebargaining eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights fsi_open fsi_rol fsi_sec gpi_conflict gpi_safety gpi_terrorism hf_prop_rights hf_jud hf_corruption hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_execorr v2x_pubcorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption {
 
+*------ Define global for TPS to be analyzed
+
+global tps "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hf_prop_rights hf_corruption hf_jud hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption"
+
+
+*------ Normalize TPS
+
 *List of all variables to be normalized
-foreach var of varlist bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hf_prop_rights hf_corruption hf_jud hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption {
+foreach var in $tps {
 egen double `var'_max=max(`var')
 egen double `var'_min=min(`var')
 gen double `var'_norm=(`var'-`var'_min)/(`var'_max-`var'_min)
@@ -946,10 +953,9 @@ drop _merge
 
 drop year* wdi_code
 
-*Set global for variables to be 
-global variables "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hfi_security v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption"
 
-foreach v in $variables {
+*------ Rename previous year as "old"
+foreach v in $tps {
 rename `v' `v'_old
 }
 
@@ -958,7 +964,7 @@ save "${path2data}\2. Clean\TPS_old.dta", replace
 
 *------ Rename and normalize
 
-foreach v in $variables {
+foreach v in $tps {
 egen double `v'_old_max=max(`v'_old)
 egen double `v'_old_min=min(`v'_old)
 gen double `v'_old_norm=(`v'_old-`v'_old_min)/(`v'_old_max-`v'_old_min)
@@ -994,7 +1000,7 @@ merge 1:1 country using "${path2data}\2. Clean\TPS_current.dta"
 
 *------ Calculate differences
 
-foreach v in $variables {
+foreach v in $tps {
 gen double d_`v'=(`v'_norm-`v'_old_norm)/(`v'_old_norm)
 }
 

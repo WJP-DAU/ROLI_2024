@@ -469,8 +469,6 @@ save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s3_n.dta", replac
 restore
 
 
-
-
 *----- Aggregate Scores - Removing sub-factor outliers + general outliers + discipline outliers (scenario 4)
 
 
