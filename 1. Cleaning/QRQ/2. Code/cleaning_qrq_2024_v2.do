@@ -7430,7 +7430,7 @@ drop  aux_cc-tag
 
 
 /*=================================================================================================================
-					XI. FINAL Country Averages
+					XI. FINAL Country Averages - question level
 =================================================================================================================*/
 
 //cc_q6a_usd cc_q6a_gni 
@@ -7453,7 +7453,7 @@ drop total_score- total_score_mean
 *order WJP_password cc_q6a_usd cc_q6a_gni, last
 order WJP_password, last
 drop WJP_password
-*save "$path2data\3. Final\qrq_country_averages.dta", replace
+*save "$path2data\3. Final\qrq_country_averages_{$year_current}.dta", replace
 
 br
 
