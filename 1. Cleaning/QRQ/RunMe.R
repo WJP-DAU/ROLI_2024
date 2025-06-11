@@ -385,11 +385,9 @@ qrq_scores_analysis <- qrq_subfactors_final %>%
       T ~ NA_character_
     ),
     diff_subfactor_cat = case_when(
-      diff_subfactor == 0                         ~ "No differences",
-      diff_subfactor > 0 & diff_subfactor < 0.01     ~ "Differences below 0.01",
+      diff_subfactor < 0.01     ~ "Differences below 0.01",
       diff_subfactor >= 0.01 & diff_subfactor < 0.05 ~ "Differences between 0.01 and 0.05",
-      diff_subfactor >= 0.05 & diff_subfactor < 0.1  ~ "Differences between 0.05 and 0.1",
-      diff_subfactor >= 0.1                       ~ "Differences above 0.1"
+      diff_subfactor >= 0.05                       ~ "Differences above 0.05"
     ),
     diff_subfactor_direction = case_when(
       direction_subfactor == scores_direction ~ "Same direction",
@@ -413,6 +411,59 @@ qrq_scores_analysis <- qrq_subfactors_final %>%
   #     diff_ranking >= 10 & diff_ranking < 20 ~ "Differences between 10 and 20",
   #     diff_ranking >= 20                     ~ "Differences above 20")
   # )
+
+subfactors_analysis <- qrq_scores_analysis %>%
+  filter(variables %!in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8"))
+
+diff_levels <- c(
+  "Differences below 0.01",
+  "Differences between 0.01 and 0.05",
+  "Differences above 0.05"
+)
+data_diff       <- proportions_data(subfactors_analysis,
+                                    "diff_subfactor_cat", diff_levels)
+
+p_differences   <- plot_bar(data_diff, 
+                            "diff_subfactor_cat",
+                            "Distribution of differences 2024");p_differences
+
+direction_levels <- c(
+  "Same direction",
+  "Different direction"
+)
+data_direction  <- proportions_data(subfactors_analysis,
+                                    "diff_subfactor_direction", direction_levels)
+p_direction     <- plot_bar(data_direction, 
+                            "diff_subfactor_direction",
+                            "Differences in the direction 2024");p_direction  
+
+factors_analysis <- qrq_scores_analysis %>%
+  filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8"))
+
+diff_levels <- c(
+  "No differences",
+  "Differences below 0.01",
+  "Differences between 0.01 and 0.05",
+  "Differences between 0.05 and 0.1",
+  "Differences above 0.1"
+)
+data_diff       <- proportions_data(factors_analysis,
+                                    "diff_subfactor_cat", diff_levels)
+
+p_differences   <- plot_bar(data_diff, 
+                            "diff_subfactor_cat",
+                            "Distribution of differences 2024");p_differences
+
+direction_levels <- c(
+  "Same direction",
+  "Different direction"
+)
+data_direction  <- proportions_data(factors_analysis,
+                                    "diff_subfactor_direction", direction_levels)
+p_direction     <- plot_bar(data_direction, 
+                            "diff_subfactor_direction",
+                            "Differences in the direction 2024");p_direction  
+
 
 ### Proportions analysis ------------------------------------------------------
 
@@ -467,7 +518,7 @@ p_direction     <- plot_bar(data_direction,
                             "Differences in the direction 2024");p_direction
 
 data_direction  <- proportions_data(qrq_scores_analysis %>% 
-                                      filter(variables %in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")), 
+                                      filter(variables %!in% c("f_1", "f_2", "f_3", "f_4", "f_6", "f_7", "f_8")), 
                                     "diff_subfactor_direction", direction_levels) %>% drop_na()
 p_direction     <- plot_bar(data_direction, 
                             "diff_subfactor_direction",
