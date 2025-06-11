@@ -207,7 +207,7 @@ replace country="Venezuela, RB" if country=="Venezuela"
 replace country="Gambia" if country=="Gambia, The"
 
 rename (AJudicialindependence BImpartialcourts CPropertyrights DMilitaryinterference ELegalintegrity FContracts HPoliceandcrime BiiiFlexiblewagedeterminati) ///
-(ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll)
+(ewf_jud ewf_courts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll)
 
 rename Year year_ef
 
@@ -292,7 +292,7 @@ import excel "${path2data}\1. Original\Freedom House\All_data_FIW_2013-2024.xlsx
 keep if Edition>=2023
 rename Edition year
 drop Region CT Status AddQ AddA
-drop A1 A2 A3 B1 B2 B3 C1 PR D3 E2 E3 G1 G3 G4 PRrating CLrating Total
+drop A1 A2 A3 B1 B2 B3 C1 PR D3 E2 G1 G3 G4 PRrating CLrating Total
 
 rename CountryTerritory country
 
@@ -320,7 +320,7 @@ replace country="Gambia" if country=="The Gambia"
 rename (A B4 B) (fh_electoral fh_elec_lgbt fh_pluralism) 
 rename (C2 C3 C ) (fh_corr fh_open fh_functiongovt)
 rename (D1 D2 D4 D ) (fh_fotp fh_relig fh_free_view fh_expression)
-rename (E1 E) (fh_assembly fh_association)
+rename (E1 E3 E) (fh_assembly fh_unions fh_association)
 rename (F1 F2 F3 F4 F) (fh_judicial fh_due_process fh_force fh_discrim fh_rol)
 rename (G2 G) (fh_property fh_autonomy)
 rename CL fh_civilrights						
@@ -764,7 +764,7 @@ replace country="Bolivia" if country=="Bolivia, Plurinational State of"
 replace country="Bosnia and Herzegovina" if country=="Bosnia-Herzegovina"
 replace country="Morocco" if country=="Morocco / Western Sahara "
 
-rename (var pvr rqr rlr ccr) (wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption)
+rename (var pvr rqr rlr ccr) (wgi_account wgi_pol wgi_reg wgi_rol wgi_corr)
 
 rename year year_wgi
 
@@ -786,6 +786,7 @@ use "${path2data}\2. Clean\general_info.dta", clear
 
 replace country="Bahamas" if country=="The Bahamas"
 replace country="Gambia" if country=="The Gambia"
+replace country="Cote d'Ivoire" if country=="Côte d'Ivoire"
 
 *filelist, list
 
@@ -867,12 +868,12 @@ br
 *rename gpi_safety_2023 gpi_safety
 *rename gpi_terrorism_2022 gpi_terrorism
 
-*foreach var of varlist bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr bti_civil cpi ewf_judicialindependence ewf_impartialcourts ewf_prop ewf_military ewf_legalsystemintegrity ewf_contracts ewf_police ewf_collectivebargaining eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights fsi_open fsi_rol fsi_sec gpi_conflict gpi_safety gpi_terrorism hf_prop_rights hf_jud hf_corruption hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_execorr v2x_pubcorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption {
+*foreach var of varlist bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr bti_civil cpi ewf_judicialindependence ewf_courts ewf_prop ewf_military ewf_legalsystemintegrity ewf_contracts ewf_police ewf_collectivebargaining eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights fsi_open fsi_rol fsi_sec gpi_conflict gpi_safety gpi_terrorism hf_prop_rights hf_jud hf_corruption hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_execorr v2x_pubcorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_corr {
 
 
 *------ Define global for TPS to be analyzed
 
-global tps "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hf_prop_rights hf_corruption hf_jud hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption"
+global tps "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_courts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll eiu_electoralprocess eiu_fun_gov eiu_civilliberties fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_unions fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hf_prop_rights hf_corruption hf_jud hf_freedom hf_laborfreedom hfi_security open_budget_index pei pressfree v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_corr"
 
 
 *------ Normalize TPS
@@ -908,8 +909,8 @@ foreach var of varlist v2x_pubcorr_norm v2x_corr_norm v2x_execorr_norm {
 replace `var'=1-`var'
 }
 
-replace country="The Bahamas" if country=="Bahamas"
-replace country="The Gambia" if country=="Gambia"
+*replace country="The Bahamas" if country=="Bahamas"
+*replace country="The Gambia" if country=="Gambia"
 
 br
 
@@ -917,7 +918,21 @@ save "${path2data}\2. Clean\TPS_current.dta", replace
 
 
 /*=================================================================================================================
-					4. Changes over time
+					4. Rankings for BENCHMARK
+=================================================================================================================*/
+
+preserve
+
+foreach v of varlist *_norm {
+		display as error "`v'" 
+		egen `v'_r=rank(`v'), field
+}
+
+save "${path2data}\2. Clean\TPS_benchmark.dta", replace
+restore
+
+/*=================================================================================================================
+					5. Changes over time
 =================================================================================================================*/
 
 *------ Merge old datasets (previous year)
@@ -957,7 +972,7 @@ drop year* wdi_code
 
 *------ Define global for TPS to be analyzed over time (NOTE FOR NATALIA: IN AN IDEAL WORLD, TPS CURRENT AND CHANGES ARE THE SAME SOURCES)
 
-global tps_changes "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_impartialcourts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hfi_security v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_controlofcorruption"
+global tps_changes "bti_dogmas bti_fairelection bti_assembly bti_expression bti_rol bti_sep bti_independentjud bti_abuse bti_civilrights bti_sociobarrier bti_privateprop bti_propright bti_equalopp bti_anticorr cpi ewf_jud ewf_courts ewf_prop ewf_military ewf_legal ewf_contracts ewf_police ewf_coll fh_electoral fh_elec_lgbt fh_pluralism fh_corr fh_open fh_functiongovt fh_fotp fh_relig fh_free_view fh_expression fh_assembly fh_unions fh_association fh_judicial fh_due_process fh_force fh_discrim fh_rol fh_property fh_autonomy fh_civilrights hfi_security v2x_freexp_altinf v2x_frassoc_thick v2xel_frefair v2xcl_rol v2x_jucon v2xlg_legcon v2x_cspart v2xeg_eqprotec v2elffelr v2exrescon v2exbribe v2exembez v2excrptps v2lginvstp v2lgotovst v2lgcrrpt v2jupoatck v2juaccnt v2clrelig v2mecenefm v2meharjrn v2caassemb v2xnp_regcorr v2x_corr v2x_pubcorr v2x_execorr v2x_rule wgi_account wgi_pol wgi_reg wgi_rol wgi_corr"
 
 *------ Rename previous year as "old"
 foreach v in $tps_changes {

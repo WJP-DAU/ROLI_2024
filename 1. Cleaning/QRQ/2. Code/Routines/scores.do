@@ -23,7 +23,7 @@ all_q2_norm
 all_q20_norm
 all_q21_norm ) ; 
 
-egen f_1_2=rowmean( f_1_2_*) ; 
+egen f_1_2=rowmean(f_1_2_A) ; 
 
 egen f_1_3_A=rowmean(
 all_q2_norm
@@ -35,7 +35,7 @@ all_q6_norm
 all_q7_norm
 all_q8_norm ) ; 
 
-egen f_1_3=rowmean(f_1_3_*) ; 
+egen f_1_3=rowmean(f_1_3_A) ; 
 
 egen f_1_4=rowmean(
 cc_q33_norm
@@ -49,7 +49,7 @@ all_q52_norm
 all_q53_norm
 all_q93_norm) ; 
 
-egen f_1_5_1=rowmean(f_1_5_1_*) ; 
+egen f_1_5_1=rowmean(f_1_5_1_A) ; 
 
 egen f_1_5_2=rowmean(
 all_q10_norm
@@ -64,7 +64,7 @@ cj_q36a_norm
 cj_q9_norm
 cj_q8_norm) ; 
 
-egen f_1_5_4=rowmean(f_1_5_4_*) ; 
+egen f_1_5_4=rowmean(f_1_5_4_A) ; 
 
 egen f_1_5=rowmean( f_1_5_1 f_1_5_2 f_1_5_3 f_1_5_4 ) ;
 
@@ -72,7 +72,7 @@ egen f_1_6_1_A=rowmean(
 all_q13_norm
 all_q14_norm) ; 
 
-egen f_1_6_1=rowmean( f_1_6_1_*) ; 
+egen f_1_6_1=rowmean(f_1_6_1_A) ; 
 
 egen f_1_6_2_A=rowmean(
 all_q15_norm
@@ -82,7 +82,7 @@ cj_q10_norm
 all_q18_norm
 all_q94_norm) ; 
 
-egen f_1_6_2=rowmean(f_1_6_2_*) ; 
+egen f_1_6_2=rowmean(f_1_6_2_A) ; 
 
 egen f_1_6_3_A=rowmean(
 all_q19_norm) ; 
@@ -91,7 +91,7 @@ egen f_1_6_3_B=rowmean(
 all_q20_norm
 all_q21_norm) ; 
 
-egen f_1_6_3=rowmean(f_1_6_3*) ;  
+egen f_1_6_3=rowmean(f_1_6_3_A f_1_6_3_B) ;  
 
 
 egen f_1_6=rowmean(f_1_6_1 f_1_6_2 f_1_6_3) ;
@@ -122,7 +122,7 @@ ph_q5a_norm
 ph_q5b_norm
 ph_q7_norm ) ; 
 
-egen f_2_1_1=rowmean(f_2_1_1_*) ; 
+egen f_2_1_1=rowmean(f_2_1_1_A f_2_1_1_B) ; 
 
 
 egen f_2_1_2_1_A=rowmean(
@@ -135,7 +135,7 @@ lb_q17e_norm
 lb_q17c_norm
 ph_q8d_norm) ; 
 
-egen f_2_1_2_1=rowmean(f_2_1_2_1_*) ; 
+egen f_2_1_2_1=rowmean(f_2_1_2_1_A) ; 
 
 egen f_2_1_2_2_A=rowmean(
 lb_q17b_norm
@@ -151,7 +151,7 @@ ph_q12c_norm
 ph_q12d_norm
 ph_q12e_norm) ; 
  
-egen f_2_1_2_2=rowmean(f_2_1_2_2_*) ; 
+egen f_2_1_2_2=rowmean(f_2_1_2_2_A) ; 
 
 egen f_2_1_2_3=rowmean(
 all_q54_norm
@@ -185,7 +185,7 @@ cj_q33c_norm
 cj_q33d_norm
 cj_q33e_norm) ;
 
-egen f_2_2=rowmean(f_2_2_*) ; 
+egen f_2_2=rowmean(f_2_2_1 f_2_2_2) ; 
  
 egen f_2_3_A=rowmean( 
 cj_q32c_norm
@@ -201,7 +201,7 @@ cj_q34e_norm
 cj_q16j_norm
 cj_q18a_norm) ; 
 
-egen f_2_3=rowmean(f_2_3_*) ; 
+egen f_2_3=rowmean(f_2_3_A) ; 
 
 egen f_2_4=rowmean(
 all_q96_norm) ; 
@@ -218,7 +218,7 @@ all_q38_norm
 cc_q32h_norm
 cc_q32i_norm) ; 
 
-egen f_3_1=rowmean(f_3_1_*) ; 
+egen f_3_1=rowmean(f_3_1_1) ; 
 
 egen f_3_2_2=rowmean( 
 cc_q9b_norm
@@ -244,13 +244,13 @@ all_q45_norm
 all_q46_norm
 all_q47_norm ) ; 
 
-egen f_3_2=rowmean( f_3_2_*) ; 
+egen f_3_2=rowmean(f_3_2_2 f_3_2_3 f_3_2_4 f_3_2_5 f_3_2_6) ; 
 
 egen f_3_3_1_A_1=rowmean(
 all_q13_norm
 all_q14_norm) ; 
 
-egen f_3_3_1_A=rowmean(f_3_3_1_A_* ) ; 
+egen f_3_3_1_A=rowmean(f_3_3_1_A_1) ; 
 
 egen f_3_3_1_B_1=rowmean( 
 all_q15_norm
@@ -260,7 +260,7 @@ cj_q10_norm
 all_q18_norm
 all_q94_norm) ; 
 
-egen f_3_3_1_B=rowmean(f_3_3_1_B_*) ; 
+egen f_3_3_1_B=rowmean(f_3_3_1_B_1) ; 
 
 egen f_3_3_1_C_1=rowmean( 
 all_q19_norm); 
@@ -279,7 +279,7 @@ all_q31_norm
 all_q32_norm
 all_q14_norm) ; 
 
-egen f_3_3_2=rowmean( f_3_3_2_*) ; 
+egen f_3_3_2=rowmean(f_3_3_2_1) ; 
 
 egen f_3_3_3=rowmean( 
 cc_q9a_norm
@@ -287,7 +287,7 @@ cc_q11b_norm
 cc_q32j_norm
 all_q105_norm ) ; 
 
-egen f_3_3=rowmean( f_3_3_1 f_3_3_2 f_3_3_3  ); 
+egen f_3_3=rowmean( f_3_3_1 f_3_3_2 f_3_3_3 ); 
  
 egen f_3_4=rowmean(
 cc_q9c_norm 
@@ -425,7 +425,7 @@ cj_q10_norm
 all_q18_norm
 all_q94_norm) ; 
 
-egen f_4_4_2=rowmean(f_4_4_2_*) ; 
+egen f_4_4_2=rowmean(f_4_4_2_A) ; 
 
 egen f_4_4_3_A=rowmean(
 all_q19_norm) ; 
@@ -448,7 +448,7 @@ all_q29_norm) ;
 egen f_4_5_B=rowmean(
 all_q30_norm);
 
-egen f_4_5=rowmean(f_4_5_*) ; 
+egen f_4_5=rowmean(f_4_5_A f_4_5_B) ; 
 
 
 egen f_4_6=rowmean(
@@ -463,7 +463,7 @@ all_q31_norm
 all_q32_norm
 all_q14_norm) ; 
 
-egen f_4_7=rowmean(f_4_7_*) ; 
+egen f_4_7=rowmean(f_4_7_A) ; 
 
 
 egen f_4_8_1_A=rowmean(
@@ -554,7 +554,7 @@ lb_q17e_norm
 lb_q17c_norm
 ph_q8d_norm) ; 
 
-egen f_6_2_2_1=rowmean(f_6_2_2_1_*) ; 
+egen f_6_2_2_1=rowmean(f_6_2_2_1_A) ; 
 
 egen f_6_2_2_2_A=rowmean(
 lb_q17b_norm
@@ -574,7 +574,7 @@ ph_q12c_norm
 ph_q12d_norm
 ph_q12e_norm) ; 
 
-egen f_6_2_2_2=rowmean(f_6_2_2_2_*) ; 
+egen f_6_2_2_2=rowmean(f_6_2_2_2_A) ; 
 
 egen f_6_2_2=rowmean(f_6_2_2_1 f_6_2_2_2 ) ; 
 
@@ -643,7 +643,7 @@ egen f_7_1_5_A=rowmean(
 all_q71_norm
 all_q72_norm) ; 
 
-egen f_7_1_5=rowmean(f_7_1_5_*); 
+egen f_7_1_5=rowmean(f_7_1_5_A); 
 
 
 egen f_7_1=rowmean(f_7_1_1 f_7_1_2 f_7_1_3 f_7_1_4 f_7_1_5  ) ; 
@@ -699,7 +699,7 @@ egen f_7_5_2=rowmean(
 all_q88_norm
 cc_q26a_norm) ; 
 
-egen f_7_5=rowmean(f_7_5_*) ; 
+egen f_7_5=rowmean(f_7_5_1 f_7_5_2) ; 
 
 egen f_7_6_1=rowmean(
 cc_q26b_norm); 
@@ -708,7 +708,7 @@ egen f_7_6_2=rowmean(
 all_q86_norm
 all_q87_norm); 
 
-egen f_7_6=rowmean(f_7_6_*) ; 
+egen f_7_6=rowmean(f_7_6_1 f_7_6_2) ; 
 
 
 egen f_7_7_1=rowmean( 
@@ -726,7 +726,7 @@ egen f_7_7_5=rowmean(
 cc_q14a_norm
 cc_q14b_norm); 
  
-egen f_7_7=rowmean(f_7_7_*) ; 
+egen f_7_7=rowmean(f_7_7_1 f_7_7_3 f_7_7_4 f_7_7_5) ; 
 
 
 
@@ -757,7 +757,7 @@ cj_q25a_norm
 cj_q25b_norm
 cj_q25c_norm); 
 
-egen f_8_1_1=rowmean(f_8_1_1_*) ; 
+egen f_8_1_1=rowmean(f_8_1_1_A f_8_1_1_B) ; 
 
 
 egen f_8_1=rowmean(f_8_1_1) ; 
@@ -775,7 +775,7 @@ cj_q20b_norm);
 egen f_8_2_2_A=rowmean(
 cj_q20e_norm) ; 
 
-egen f_8_2_2=rowmean(f_8_2_2_*) ; 
+egen f_8_2_2=rowmean(f_8_2_2_A) ; 
 
 egen f_8_2=rowmean(f_8_2_1 f_8_2_2 ) ; 
 
@@ -795,7 +795,7 @@ cj_q12d_norm
 cj_q12e_norm
 cj_q12f_norm) ; 
 
-egen f_8_4_1=rowmean(f_8_4_1_*); 
+egen f_8_4_1=rowmean(f_8_4_1_A); 
 
 egen f_8_4_2=rowmean( 
 cj_q20o_norm); 
@@ -822,7 +822,7 @@ cj_q16j_norm
 cj_q18a_norm
 cj_q18d_norm); 
 
-egen f_8_5_1=rowmean(f_8_5_1_*); 
+egen f_8_5_1=rowmean(f_8_5_1_A); 
 
 
 egen f_8_5_2_A=rowmean( 
@@ -831,7 +831,7 @@ cj_q20k_norm
 cj_q24b_norm
 cj_q24c_norm) ; 
 
-egen f_8_5_2=rowmean( f_8_5_2_*); 
+egen f_8_5_2=rowmean( f_8_5_2_A); 
 
 
 egen f_8_5=rowmean(f_8_5_1 f_8_5_2) ; 
