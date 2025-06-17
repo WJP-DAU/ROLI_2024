@@ -269,23 +269,195 @@ gen count_`x'_long=1 if question=="`x'" & longitudinal==1
 **                                  SCENARIO 0                                                     **
 *****************************************************************************************************
 
-*----- Aggregate Scores - NO DELETIONS (scenario 0)
+** READ: Aggregate Scores - NO DELETIONS (scenario 0)
+
+*----- Scores
 
 preserve
 
-collapse (mean) $norm (sum) count_cc count_cj count_lb count_ph count_cc_long count_cj_long count_lb_long count_ph_long, by(country)
+collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s0.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s0.dta", replace
+
+
+*- Creating rankings for NEXT SCENARIO 
+
+drop *_norm
+
+foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_6 f_7 f_8 ROLI {
+	display as result "`v'"
+	egen `v'_r=rank(`v'), field	
+}
+
+save "$path2data\2. Scenarios\Proportions\qrq_rankings_s0.dta", replace
+
+restore
+
+
+*----- Counts
+
+preserve
+
+collapse (sum) count_cc count_cj count_lb count_ph count_cc_long count_cj_long count_lb_long count_ph_long, by(country)
 
 keep country count_cc count_cj count_lb count_ph count_cc_long count_cj_long count_lb_long count_ph_long
 egen total_counts=rowtotal(count_cc count_cj count_lb count_ph)
 egen total_counts_long=rowtotal(count_cc_long count_cj_long count_lb_long count_ph_long)
 
-save "$path2data\2. Scenarios\Alternative\country_counts_s0.dta", replace
+save "$path2data\2. Scenarios\Proportions\country_counts_s0.dta", replace
 
 restore
+
+
+*****************************************************************************************************
+**                                  SCENARIO TPS 1                                                 **
+*****************************************************************************************************
+
+** READ: Aggregate Scores - TPS 1
+
+*----- TPS DIRECTION
+
+preserve
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Save dataset with TPS direction for system
+gen TPS_direction=""
+replace TPS_direction="Positive" if positive_TPS>0.5
+replace TPS_direction="Negative" if negative_TPS>0.5
+
+collapse (firstnm) TPS_direction, by(country)
+
+save "$path2data\2. Scenarios\Proportions\qrq_TPS_direction.dta", replace
+restore
+
+
+*----- POSITIVE OUTLIERS
+
+preserve
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
+
+
+*** Saving scenario scores
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s_INT_p.dta", replace
+
+restore
+
+
+*-----  NEGATIVE OUTLIERS
+
+preserve
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+
+*** Saving scenario scores
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s_INT_n.dta", replace
+
+restore
+
+
+*****************************************************************************************************
+**                                  SCENARIO TPS 2                                                 **
+*****************************************************************************************************
+
+** READ: Aggregate Scores - TPS 2
+
+*----- POSITIVE OUTLIERS
+
+preserve
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the highest experts for countries where the TPS say the change is negative
+drop if top_c==1 & N>20 & N_questionnaire>5 & positive_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Saving scenario scores
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s_INT2_p.dta", replace
+
+restore
+
+
+*-----  NEGATIVE OUTLIERS
+
+preserve
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the lowest experts for countries where the TPS say the change is positive
+drop if low_c==1 & N>20 & N_questionnaire>5 & negative_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Saving scenario scores
+
+collapse (mean) $norm, by(country)
+
+qui do "${path2dos}\Routines\scores.do"
+
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s_INT2_n.dta", replace
+
+restore
+
 
 
 *****************************************************************************************************
@@ -295,38 +467,90 @@ restore
 ** READ: Aggregate Scores - Removing general extreme outliers (scenario 1)
 
 
-*----- POSITIVE OUTLIERS
+*------------ POSITIVE OUTLIERS
+
 preserve
 
-*Outliers routine (scenario 1)
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the highest experts for countries where the TPS say the change is negative
+drop if top_c==1 & N>20 & N_questionnaire>5 & positive_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_hi==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_hi==1 & N>20 & N_questionnaire>5
+drop if top==1 & N>20 & N_questionnaire>5 
 
 collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s1_p.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s1_p.dta", replace
 
 restore
 
 
-*-----  NEGATIVE OUTLIERS
+*------------  NEGATIVE OUTLIERS
+
 preserve
 
-*Outliers routine (scenario 1)
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the lowest experts for countries where the TPS say the change is positive
+drop if low_c==1 & N>20 & N_questionnaire>5 & negative_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_lo==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_lo==1 & N>20 & N_questionnaire>5
+drop if low==1 & N>20 & N_questionnaire>5 
 
 collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s1_n.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s1_n.dta", replace
 
 restore
 
@@ -338,166 +562,117 @@ restore
 ** READ: Aggregate Scores - outliers by discipline (highest/lowest) (scenario 2)
 
 
-*-----  POSITIVE OUTLIERS
+*------------  POSITIVE OUTLIERS
+
 preserve
 
-*Outliers routine (scenario 1)
-qui do "${path2dos}\Routines\outliers_gen.do"
 
-*Dropping general outliers
-drop if outlier_hi==1 & N>20 & N_questionnaire>5
+*** TPS 1 
 
-*Outliers routine (scenario 2)
-qui do "${path2dos}\Routines\outliers_dis.do"
-
-*Dropping outliers by disciplines (IQR)
-foreach x in cc cj lb ph {
-	drop if outlier_iqr_`x'_hi==1
-}
-
-collapse (mean) $norm, by(country)
-
-qui do "${path2dos}\Routines\scores.do"
-
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s2_p.dta", replace
-
-
-*-- Creating rankings for NEXT SCENARIO 
-
-drop *_norm
-
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_6 f_7 f_8 ROLI {
-	display as result "`v'"
-	egen `v'_r=rank(`v'), field	
-}
-
-save "$path2data\2. Scenarios\Alternative\qrq_rankings_s2_p.dta", replace
-
-restore
-
-
-*-----  NEGATIVE OUTLIERS
-preserve
-
-*Outliers routine (scenario 1)
-qui do "${path2dos}\Routines\outliers_gen.do"
-
-*Dropping general outliers
-drop if outlier_lo==1 & N>20 & N_questionnaire>5
-
-*Outliers routine (scenario 2)
-qui do "${path2dos}\Routines\outliers_dis.do"
-
-*Dropping outliers by disciplines (IQR)
-foreach x in cc cj lb ph {
-	drop if outlier_iqr_`x'_lo==1
-}
-
-collapse (mean) $norm, by(country)
-
-qui do "${path2dos}\Routines\scores.do"
-
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s2_n.dta", replace
-
-
-*Creating rankings for NEXT SCENARIO 
-
-drop *_norm
-
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_6 f_7 f_8 ROLI {
-	display as result "`v'"
-	egen `v'_r=rank(`v'), field	
-}
-
-save "$path2data\2. Scenarios\Alternative\qrq_rankings_s2_n.dta", replace
-
-restore
-
-
-*****************************************************************************************************
-**                                  SCENARIO INTERMEDIATE                                          **
-*****************************************************************************************************
-
-** READ: Aggregate Scores -INTERMEDIATE SCENARIO
-
-*----- POSITIVE OUTLIERS
-preserve
-
-*Outliers routine (scenario 1)
-qui do "${path2dos}\Routines\outliers_gen.do"
-
-*Dropping general outliers
-drop if outlier_hi==1 & N>20 & N_questionnaire>5
-
-*Outliers routine (scenario 2)
-qui do "${path2dos}\Routines\outliers_dis.do"
-
-*Dropping outliers by disciplines (IQR)
-foreach x in cc cj lb ph {
-	drop if outlier_iqr_`x'_hi==1
-}
-
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
 
 *Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
-drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS_n>=0.65
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
 
 qui do "${path2dos}\Routines\drop_tps.do"
 
-*** END INTERMEDIATE
+drop top_per top low_per low
 
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the highest experts for countries where the TPS say the change is negative
+drop if top_c==1 & N>20 & N_questionnaire>5 & positive_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
+qui do "${path2dos}\Routines\outliers_gen.do"
+
+*Dropping general outliers
+*drop if outlier_iqr_hi==1 & N>20 & N_questionnaire>5
+drop if top==1 & N>20 & N_questionnaire>5 
+
+
+*** Scenario 2: Discipline outliers routine
+qui do "${path2dos}\Routines\outliers_dis.do"
+
+/*
+*Dropping outliers by disciplines (IQR)
+foreach x in cc cj lb ph {
+	drop if outlier_iqr_`x'_hi==1
+}
+*/
+
+drop if top_dis==1 & N>20 & N_questionnaire>5 
 
 collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s_INT_p.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s2_p.dta", replace
 
 restore
 
 
-*-----  NEGATIVE OUTLIERS
+*------------  NEGATIVE OUTLIERS
 
 preserve
 
-*Outliers routine (scenario 1)
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the lowest experts for countries where the TPS say the change is positive
+drop if low_c==1 & N>20 & N_questionnaire>5 & negative_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_lo==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_lo==1 & N>20 & N_questionnaire>5
+drop if low==1 & N>20 & N_questionnaire>5 
 
-*Outliers routine (scenario 2)
+
+*** Scenario 2: Discipline outliers routine
 qui do "${path2dos}\Routines\outliers_dis.do"
 
+/*
 *Dropping outliers by disciplines (IQR)
 foreach x in cc cj lb ph {
 	drop if outlier_iqr_`x'_lo==1
 }
+*/
 
-
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
-
-*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
-drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>=0.65
-
-qui do "${path2dos}\Routines\drop_tps.do"
-
-*** END INTERMEDIATE
-
+drop if low_dis==1 & N>20 & N_questionnaire>5 
 
 collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s_INT_n.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s2_n.dta", replace
 
 restore
 
@@ -509,46 +684,64 @@ restore
 ** READ: Aggregate Scores - Removing question outliers + general outliers + discipline outliers (scenario 3)
 
 
-*----- POSITIVE OUTLIERS
+*------------ POSITIVE OUTLIERS
 
 preserve
 
-*Outliers routine (scenario 1)
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the highest experts for countries where the TPS say the change is negative
+drop if top_c==1 & N>20 & N_questionnaire>5 & positive_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_hi==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_hi==1 & N>20 & N_questionnaire>5
+drop if top==1 & N>20 & N_questionnaire>5 
 
-*Outliers routine (scenario 2)
+
+*** Scenario 2: Discipline outliers routine
 qui do "${path2dos}\Routines\outliers_dis.do"
 
+/*
 *Dropping outliers by disciplines (IQR)
 foreach x in cc cj lb ph {
 	drop if outlier_iqr_`x'_hi==1
 }
+*/
+
+drop if top_dis==1 & N>20 & N_questionnaire>5 
 
 
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
-
-*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
-drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS_n>=0.65
-
-qui do "${path2dos}\Routines\drop_tps.do"
-
-*** END INTERMEDIATE
-
-
-*Outliers routine (scenario 3) - This routine defines the outliers by question
+*** Scenario 3: Outliers routine - This routine defines the outliers by question
 qui do "${path2dos}\Routines\outliers_ques.do"
 
 *This routine defines the globals for each sub-factor (all questions included in the sub-factor)
 qui do "${path2dos}\Routines\subfactor_questions.do"
 
-*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+
+*** Scenario 4: Outliers routine - This routine defines the sub-factor outliers 
 qui do "${path2dos}\Routines\outliers_sub.do"
 
 *Dropping questions that are outliers (max-min values with a proportion of less than 15% only for the experts who have the extreme values in questions & sub-factor)
@@ -556,7 +749,8 @@ foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f
 	display as result "`v'"
 	foreach x of global `v' {
 		display as error "`x'" 
-		replace `x'=. if `x'==`x'_max & `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1		
+		*replace `x'=. if `x'==`x'_max & `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1
+		replace `x'=. if `x'==`x'_max & `x'_hi_p<0.15 & `x'_c>5 & `x'!=. & top_`v'==1 
 }
 }
 
@@ -564,48 +758,66 @@ collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s3_p.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s3_p.dta", replace
 
 restore
 
 
-*----- NEGATIVE OUTLIERS
+*------------ NEGATIVE OUTLIERS
 
 preserve
 
-*Outliers routine (scenario 1)
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the lowest experts for countries where the TPS say the change is positive
+drop if low_c==1 & N>20 & N_questionnaire>5 & negative_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_lo==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_lo==1 & N>20 & N_questionnaire>5
+drop if low==1 & N>20 & N_questionnaire>5 
 
-*Outliers routine (scenario 2)
+
+*** Scenario 2: Discipline outliers routine
 qui do "${path2dos}\Routines\outliers_dis.do"
 
+/*
 *Dropping outliers by disciplines (IQR)
 foreach x in cc cj lb ph {
 	drop if outlier_iqr_`x'_lo==1
 }
+*/
+
+drop if low_dis==1 & N>20 & N_questionnaire>5 
 
 
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
-
-*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
-drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>=0.65
-
-qui do "${path2dos}\Routines\drop_tps.do"
-
-*** END INTERMEDIATE
-
-
-*Outliers routine (scenario 3) - This routine defines the outliers by question
+*** Scenario 3: Outliers routine - This routine defines the outliers by question
 qui do "${path2dos}\Routines\outliers_ques.do"
 
-*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+
+*** Scenario 4: Outliers routine - This routine defines the sub-factor outliers 
 qui do "${path2dos}\Routines\outliers_sub.do"
 
 *This routine defines the globals for each sub-factor (all questions included in the sub-factor)
@@ -616,7 +828,8 @@ foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f
 	display as result "`v'"
 	foreach x of global `v' {
 		display as error "`x'" 		
-		replace `x'=. if `x'==`x'_min & `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1
+		*replace `x'=. if `x'==`x'_min & `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1
+		replace `x'=. if `x'==`x'_min & `x'_lo_p<0.15 & `x'_c>5 & `x'!=. & low_`v'==1 
 		
 }
 }
@@ -625,7 +838,7 @@ collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s3_n.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s3_n.dta", replace
 
 restore
 
@@ -637,43 +850,61 @@ restore
 ** READ: Aggregate Scores - Removing sub-factor outliers + general outliers + discipline outliers (scenario 4)
 
 
-*----- POSITIVE OUTLIERS
+*------------ POSITIVE OUTLIERS
 
 preserve
 
-*Outliers routine (scenario 1)
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
+drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the highest experts for countries where the TPS say the change is negative
+drop if top_c==1 & N>20 & N_questionnaire>5 & positive_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_hi==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_hi==1 & N>20 & N_questionnaire>5
+drop if top==1 & N>20 & N_questionnaire>5 
 
-*Outliers routine (scenario 2)
+
+*** Scenario 2: Discipline outliers routine
 qui do "${path2dos}\Routines\outliers_dis.do"
 
+/*
 *Dropping outliers by disciplines (IQR)
 foreach x in cc cj lb ph {
 	drop if outlier_iqr_`x'_hi==1
 }
+*/
+
+drop if top_dis==1 & N>20 & N_questionnaire>5 
 
 
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
-
-*Dropping the highest experts for countries where the TPS say the scores are too positive (dif index - dif TPS < negative diff)
-drop if top==1 & N>20 & N_questionnaire>5 & positive_TPS_n>=0.65
-
-qui do "${path2dos}\Routines\drop_tps.do"
-
-*** END INTERMEDIATE
-
-
-*Outliers routine (scenario 3) - This routine defines the outliers by question
+*** Scenario 3: Outliers routine - This routine defines the outliers by question
 qui do "${path2dos}\Routines\outliers_ques.do"
 
-*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+
+*** Scenario 4: Outliers routine - This routine defines the sub-factor outliers 
 qui do "${path2dos}\Routines\outliers_sub.do"
 
 *This routine defines the globals for each sub-factor (all questions included in the sub-factor)
@@ -694,7 +925,8 @@ f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
 	display as result "`v'"	;
 	foreach x of global `v' {;
 		display as error "`x'" ;
-		replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1 ;	
+		*replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_hi==1 ;
+		replace `x'=. if `x'_c>5 & `x'!=. & top_`v'==1 ;	
 };
 };
 #delimit cr
@@ -703,48 +935,66 @@ collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s4_p.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s4_p.dta", replace
 
 restore
 
 
-*----- NEGATIVE OUTLIERS
+*------------ NEGATIVE OUTLIERS
 
 preserve
 
-*Outliers routine (scenario 1)
+
+*** TPS 1 
+
+qui do "${path2dos}\Routines\outliers_tps_prop.do"
+
+*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
+drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>0.5
+
+drop N N_questionnaire
+
+qui do "${path2dos}\Routines\drop_tps.do"
+
+drop top_per top low_per low
+
+
+*** TPS 2
+
+qui do "${path2dos}\Routines\outliers_tps_changes.do"
+
+*Dropping the lowest experts for countries where the TPS say the change is positive
+drop if low_c==1 & N>20 & N_questionnaire>5 & negative_TPS_c>0.5
+
+drop N N_questionnaire
+
+
+*** Scenario 1: General outliers routine 
 qui do "${path2dos}\Routines\outliers_gen.do"
 
 *Dropping general outliers
-drop if outlier_lo==1 & N>20 & N_questionnaire>5
+*drop if outlier_iqr_lo==1 & N>20 & N_questionnaire>5
+drop if low==1 & N>20 & N_questionnaire>5 
 
-*Outliers routine (scenario 2)
+
+*** Scenario 2: Discipline outliers routine
 qui do "${path2dos}\Routines\outliers_dis.do"
 
+/*
 *Dropping outliers by disciplines (IQR)
 foreach x in cc cj lb ph {
 	drop if outlier_iqr_`x'_lo==1
 }
+*/
+
+drop if low_dis==1 & N>20 & N_questionnaire>5 
 
 
-*** INTERMEDIATE
-
-drop N N_questionnaire
-
-qui do "${path2dos}\Routines\outliers_tps_alt1.do"
-
-*Dropping the lowest experts for countries where the TPS say the scores are too negative (dif index - dif TPS > positive diff)
-drop if low==1 & N>20 & N_questionnaire>5 & negative_TPS_n>=0.65
-
-qui do "${path2dos}\Routines\drop_tps.do"
-
-*** END INTERMEDIATE
-
-
-*Outliers routine (scenario 3) - This routine defines the outliers by question
+*** Scenario 3: Outliers routine - This routine defines the outliers by question
 qui do "${path2dos}\Routines\outliers_ques.do"
 
-*Outliers routine (scenario 4) - This routine defines the sub-factor outliers 
+
+*** Scenario 4: Outliers routine - This routine defines the sub-factor outliers 
 qui do "${path2dos}\Routines\outliers_sub.do"
 
 *This routine defines the globals for each sub-factor (all questions included in the sub-factor)
@@ -765,7 +1015,8 @@ f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7
 	display as result "`v'"	;
 	foreach x of global `v' {;
 		display as error "`x'" ;
-		replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1 ;	
+		*replace `x'=. if `x'_c>5 & `x'!=. & outlier_`v'_iqr_lo==1 ;	
+		replace `x'=. if `x'_c>5 & `x'!=. & low_`v'==1 ;	
 };
 };
 #delimit cr
@@ -774,7 +1025,7 @@ collapse (mean) $norm, by(country)
 
 qui do "${path2dos}\Routines\scores.do"
 
-save "$path2data\2. Scenarios\Alternative\qrq_country_averages_s4_n.dta", replace
+save "$path2data\2. Scenarios\Proportions\qrq_country_averages_s4_n.dta", replace
 
 restore
 

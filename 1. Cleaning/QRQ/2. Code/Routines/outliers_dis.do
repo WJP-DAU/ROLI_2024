@@ -46,6 +46,25 @@ foreach x in cc cj lb ph {
 	replace outlier_iqr_`x'_hi=1 if total_score>=(total_score_qrq_q3+1.5*total_score_qrq_iqr) & total_score!=. & question=="`x'"
 }
 
+
+****** Experts' ranking
+
+*Creating 10% highest and lowest experts
+sort country question total_score
+by country question: egen top_per_dis=pctile(total_score), p(90)
+gen top_dis= 0
+replace top_dis = 1 if total_score >= top_per_dis
+
+sort country question total_score
+by country question: egen low_per_dis=pctile(total_score), p(10)
+gen low_dis= 0
+replace low_dis = 1 if total_score <= low_per_dis 
+
+
+
+
+
+
 /*
 gen outlier_qrq_hi=0
 replace outlier_qrq_hi=1 if total_score>=(total_score_mean_qrq+2.5*total_score_sd_qrq) & total_score~=.

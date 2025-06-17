@@ -939,6 +939,11 @@ restore
 
 use "${path2data}\2. Clean\general_info.dta", clear
 
+replace country="Bahamas" if country=="The Bahamas"
+replace country="Gambia" if country=="The Gambia"
+replace country="Cote d'Ivoire" if country=="Côte d'Ivoire"
+
+
 merge 1:1 country using "${path2data}\2. Clean\BTI_old.dta"
 drop if _merge==2
 drop _merge
@@ -1021,14 +1026,44 @@ merge 1:1 country using "${path2data}\2. Clean\TPS_current.dta"
 *------ Calculate differences
 
 foreach v in $tps_changes {
-gen double d_`v'=(`v'_norm-`v'_old_norm)/(`v'_old_norm)
+	gen double d_`v'=(`v'_norm-`v'_old_norm)/(`v'_old_norm)
+	label var d_`v' "% change TPS"
+
 }
 
+*Keeping only the changes over time
 keep country d_*
 
-rename d_* *_norm
+*rename d_* *_norm
+
+*Creating positive and negative dummies for changes over time above threshold
+foreach v in $tps_changes {
+	gen dn_c_`v'= (d_`v' >  0.1 & d_`v'!=.) //TPS changes are positive, negative outliers should be removed
+	gen dp_c_`v'= (d_`v' < -0.1 & d_`v'!=. ) //TPS changes are negative, positive outliers should be removed
+}
+
+*Create aggregate measure for changes over time
+egen positive_TPS_c_n=rowtotal(dp_c_*)
+egen negative_TPS_c_n=rowtotal(dn_c_*)
+
+*Creating number of total TPS per country - non missing observations 
+egen tps_total_c=rownonmiss(d_*)
+
+*Creating % of positive and negative TPS above the thresholds
+gen positive_TPS_c=positive_TPS_c_n/tps_total_c
+gen negative_TPS_c=negative_TPS_c_n/tps_total_c
 
 save "${path2data}\2. Clean\TPS_changes_over_time.dta", replace
 
+
+*- Creating dataset with directions
+
+gen TPS_direction_change=""
+replace TPS_direction_change="Positive" if positive_TPS_c>0.5
+replace TPS_direction_change="Negative" if negative_TPS_c>0.5
+
+collapse (firstnm) TPS_direction_change, by(country)
+
+save "${path2data}\2. Clean\TPS_changes_direction.dta", replace
 
 
