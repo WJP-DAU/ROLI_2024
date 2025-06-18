@@ -17,9 +17,11 @@ This code will flag general outliers by total score and ROLI.
 
 *----- Total number of experts by country
 bysort country: gen N=_N
+label var N "Total # of experts per country"
 
 *----- Total number of experts by country and discipline
 bysort country question: gen N_questionnaire=_N
+label var N_questionnaire "Total # of experts per discipline/country"
 
 *----- Average score and standard deviation (for outliers)
 bysort country: egen total_score_mean=mean(total_score)
@@ -55,12 +57,13 @@ sort country total_score
 by country: egen top_per=pctile(total_score), p(90)
 gen top= 0
 replace top = 1 if total_score >= top_per
+label var top "Top 10% experts"
 
 sort country total_score
 by country: egen low_per=pctile(total_score), p(10)
 gen low= 0
 replace low = 1 if total_score <= low_per 
-
+label var low "Bottom 10% experts"
 
 
 

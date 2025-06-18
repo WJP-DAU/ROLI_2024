@@ -925,11 +925,14 @@ preserve
 
 foreach v of varlist *_norm {
 		display as error "`v'" 
+		label var `v' "Country score `v'"
 		egen `v'_r=rank(`v'), field
+		label var `v'_r "Country ranking `v'"
 }
 
 save "${path2data}\2. Clean\TPS_benchmark.dta", replace
 restore
+
 
 /*=================================================================================================================
 					5. Changes over time
@@ -1027,42 +1030,65 @@ merge 1:1 country using "${path2data}\2. Clean\TPS_current.dta"
 
 foreach v in $tps_changes {
 	gen double d_`v'=(`v'_norm-`v'_old_norm)/(`v'_old_norm)
-	label var d_`v' "% change TPS"
+	label var d_`v' "% change `v'"
 
 }
 
 *Keeping only the changes over time
 keep country d_*
 
-*rename d_* *_norm
+*Create average change for all TPS
+egen average_change_TPS=rowmean(d_*)
+label var average_change_TPS "Average % change TPS"
+
+*Creating overall direction of TPS with average
+gen TPS_direction_change_average=""
+replace TPS_direction_change_average="Positive" if average_change_TPS>0 & average_change_TPS!=.
+replace TPS_direction_change_average="Negative" if average_change_TPS<0 & average_change_TPS!=.
+label var TPS_direction_change_average "TPS direction change - average"
+
 
 *Creating positive and negative dummies for changes over time above threshold
 foreach v in $tps_changes {
-	gen dn_c_`v'= (d_`v' >  0.1 & d_`v'!=.) //TPS changes are positive, negative outliers should be removed
-	gen dp_c_`v'= (d_`v' < -0.1 & d_`v'!=. ) //TPS changes are negative, positive outliers should be removed
+	gen dp_c_`v'= (d_`v' > 0 & d_`v'!=.) //TPS changes are positive, negative outliers should be removed
+	label var dp_c_`v' "Positive dummy `v' changes"
+	
+	gen dn_c_`v'= (d_`v' < 0 & d_`v'!=. ) //TPS changes are negative, positive outliers should be removed
+	label var dn_c_`v' "Negative dummy `v' changes"
 }
+
 
 *Create aggregate measure for changes over time
 egen positive_TPS_c_n=rowtotal(dp_c_*)
 egen negative_TPS_c_n=rowtotal(dn_c_*)
 
+label var positive_TPS_c_n "Total non-missing positive TPS - change"
+label var negative_TPS_c_n "Total non-missing negative TPS - change"
+
 *Creating number of total TPS per country - non missing observations 
 egen tps_total_c=rownonmiss(d_*)
+label var tps_total_c "Total TPS per country - change"
 
 *Creating % of positive and negative TPS above the thresholds
 gen positive_TPS_c=positive_TPS_c_n/tps_total_c
 gen negative_TPS_c=negative_TPS_c_n/tps_total_c
+
+label var positive_TPS_c "% of positive TPS - change"
+label var negative_TPS_c "% of negative TPS - change"
+
+gen TPS_direction_change=""
+replace TPS_direction_change="Positive" if positive_TPS_c>0.5 & positive_TPS_c!=.
+replace TPS_direction_change="Negative" if negative_TPS_c>0.5 & negative_TPS_c!=.
+replace TPS_direction_change="No change" if TPS_direction_change==""
+label var TPS_direction_change "TPS direction change"
+
 
 save "${path2data}\2. Clean\TPS_changes_over_time.dta", replace
 
 
 *- Creating dataset with directions
 
-gen TPS_direction_change=""
-replace TPS_direction_change="Positive" if positive_TPS_c>0.5
-replace TPS_direction_change="Negative" if negative_TPS_c>0.5
-
-collapse (firstnm) TPS_direction_change, by(country)
+collapse (firstnm) TPS_direction_change TPS_direction_change_average, by(country)
 
 save "${path2data}\2. Clean\TPS_changes_direction.dta", replace
 
