@@ -70,21 +70,16 @@ foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f
 	foreach x of global `v'_tps {
 		display as error "`x'" 
 		gen d_`v'_`x'= (`v'_r - `x'_r)
-		label var d_`v'_`x' "Ranking dif `v'_`x'"
 }
 }
 
-*Creating positive and negative dummies for differences in rankings of more than 30 positions. ROLI - TPS
+*Creating positive and negative dummies for differences in rankings of more than 30 positions
 foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_6 f_7 f_8 ROLI {
 	display as result "`v'"
 	foreach x of global `v'_tps {
 		display as error "`x'" 
-		
-		gen dn_`v'_`x'= (d_`v'_`x'<=-15 & d_`v'_`x'!=.)  //(ROLI - TPS) is negative: TPS is more negative, ROLI is more positive
-		label var dn_`v'_`x' "Negative dummy `v'_`x'"
-		
-		gen dp_`v'_`x'= (d_`v'_`x'>=15 & d_`v'_`x'!=.) //(ROLI - TPS) is positive: TPS is more positive, ROLI is more negative
-		label var dp_`v'_`x' "Positive dummy `v'_`x'"
+		gen dn_`v'_`x'= (d_`v'_`x'>=15 & d_`v'_`x'!=.) //Differences are positive, ROLI is more negative
+		gen dp_`v'_`x'= (d_`v'_`x'<=-15 & d_`v'_`x'!=.) //Differences are negative, ROLI is more positive
 }
 }
 
@@ -92,19 +87,13 @@ foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f
 egen positive_TPS_n=rowtotal(dp_*)
 egen negative_TPS_n=rowtotal(dn_*)
 
-label var positive_TPS_n "Total non-missing positive TPS"
-label var negative_TPS_n "Total non-missing negative TPS"
-
 *Creating number of total TPS per country - non missing observations 
 egen tps_total=rownonmiss(d_*_norm)
-label var tps_total "Total TPS per country"
 
 *Creating % of positive and negative TPS above the thresholds
 gen positive_TPS=positive_TPS_n/tps_total
 gen negative_TPS=negative_TPS_n/tps_total
 
-label var positive_TPS "% of positive TPS"
-label var negative_TPS "% of negative TPS"
 
 *Creating ranking for experts
 *bys country: egen rank_expert_p=rank(total_score), field
@@ -113,23 +102,18 @@ label var negative_TPS "% of negative TPS"
 *Creating 10% highest and lowest experts
 sort country total_score
 by country: egen top_per=pctile(total_score), p(90)
-label var top_per "Top decile score"
 gen top= 0
 replace top = 1 if total_score >= top_per
-label var top "Top 10% experts"
 
 sort country total_score
 by country: egen low_per=pctile(total_score), p(10)
-label var low_per "Bottom decile score"
 gen low= 0
 replace low = 1 if total_score <= low_per 
-label var low "Bottom 10% experts"
+
 
 * Total number of experts by country (for this exercise)
 bysort country: gen N=_N
-label var N "Total # of experts per country"
 
 * Total number of experts by country and discipline (for this exercise)
 bysort country question: gen N_questionnaire=_N
-label var N_questionnaire "Total # of experts per discipline/country"
 

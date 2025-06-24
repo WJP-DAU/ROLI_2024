@@ -1092,4 +1092,7 @@ collapse (firstnm) TPS_direction_change TPS_direction_change_average, by(country
 
 save "${path2data}\2. Clean\TPS_changes_direction.dta", replace
 
+save "C:\Users\nrodriguez\OneDrive - World Justice Project\Programmatic\Data Analytics\7. WJP ROLI\ROLI_2024\1. Cleaning\QRQ\1. Data\2. Scenarios\TPS_changes_direction.dta", replace
+
+
 
