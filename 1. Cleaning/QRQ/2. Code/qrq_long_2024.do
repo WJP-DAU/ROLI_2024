@@ -279,7 +279,7 @@ drop cc_q1- all_q105_norm
 rename CO_* *
 
 drop tag
-drop WJP_login WJP_password id_alex question- f_8 ROLI
+drop WJP_login WJP_password id_alex question- f_8 ROL
 
 sort country
 
@@ -292,7 +292,7 @@ sort country
 *Creating ROLI scores with only QRQ data
 do "${path2dos}/Routines/scores.do"
 
-keep country f_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 ///
+keep country f_1 f_1_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 ///
 f_2 f_2_1 f_2_2 f_2_3 f_2_4 ///
 f_3 f_3_1 f_3_2 f_3_3 f_3_4 ///
 f_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 ///
@@ -303,7 +303,7 @@ f_8 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 ///
 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL 
 
 *Renaming 2023 scores
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+foreach v in f_1_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL {
 	rename `v' `v'_${year_previous}
 }
 
@@ -343,7 +343,7 @@ sort country
 *Creating ROLI scores with only QRQ data
 do "${path2dos}/Routines/scores.do"
 
-keep country f_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 ///
+keep country f_1 f_1_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6  ///
 f_2 f_2_1 f_2_2 f_2_3 f_2_4 ///
 f_3 f_3_1 f_3_2 f_3_3 f_3_4 ///
 f_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 ///
@@ -354,7 +354,7 @@ f_8 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 ///
 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL 
 
 *Renaming 2024 scores
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+foreach v in f_1_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL {
 	rename `v' `v'_${year_current}
 }
 
@@ -396,14 +396,14 @@ merge 1:1 country using "$path2data\3. Final\qrq_long_${year_previous}_country_a
 drop _merge
 
 *Calculating changes over time
-foreach v in f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_1_7 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROLI {
+foreach v in f_1_1 f_1_2 f_1_3 f_1_4 f_1_5 f_1_6 f_2_1 f_2_2 f_2_3 f_2_4 f_3_1 f_3_2 f_3_3 f_3_4 f_4_1 f_4_2 f_4_3 f_4_4 f_4_5 f_4_6 f_4_7 f_4_8 f_5_3 f_6_1 f_6_2 f_6_3 f_6_4 f_6_5 f_7_1 f_7_2 f_7_3 f_7_4 f_7_5 f_7_6 f_7_7 f_8_1 f_8_2 f_8_3 f_8_4 f_8_5 f_8_6 f_8_7 f_1 f_2 f_3 f_4 f_5 f_6 f_7 f_8 ROL {
 	g double dif_`v'=(`v'_${year_current}-`v'_${year_previous})
 	g double growth_`v'=(`v'_${year_current}-`v'_${year_previous})/`v'_${year_previous}
 }
 
 keep country dif_* growth_*
 
-order country *_f_1 *_f_1_2 *_f_1_3 *_f_1_4 *_f_1_5 *_f_1_6 *_f_1_7 ///
+order country *_f_1 *_f_1_1 *_f_1_2 *_f_1_3 *_f_1_4 *_f_1_5 *_f_1_6  ///
 *_f_2 *_f_2_1 *_f_2_2 *_f_2_3 *_f_2_4 ///
 *_f_3 *_f_3_1 *_f_3_2 *_f_3_3 *_f_3_4 ///
 *_f_4 *_f_4_1 *_f_4_2 *_f_4_3 *_f_4_4 *_f_4_5 *_f_4_6 *_f_4_7 *_f_4_8 ///
@@ -412,6 +412,8 @@ order country *_f_1 *_f_1_2 *_f_1_3 *_f_1_4 *_f_1_5 *_f_1_6 *_f_1_7 ///
 *_f_7 *_f_7_1 *_f_7_2 *_f_7_3 *_f_7_4 *_f_7_5 *_f_7_6 *_f_7_7 ///
 *_f_8 *_f_8_1 *_f_8_2 *_f_8_3 *_f_8_4 *_f_8_5 *_f_8_6 *_f_8_7
 
+replace country="The Bahamas" if country=="Bahamas"
+replace country="The Gambia" if country=="Gambia"
 
 save "$path2data\3. Final\qrq_long_changes_over_time.dta", replace
 
