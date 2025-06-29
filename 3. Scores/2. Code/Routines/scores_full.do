@@ -150,7 +150,7 @@ all_q24_norm
 all_q25_norm
 all_q26_norm
 all_q8_norm
-coups_2019_2023_norm
+coups_norm
 f_1_6_A
 f_1_6_B); 
 
@@ -485,7 +485,7 @@ cj_q31e_norm
 cj_q42c_norm
 cj_q42d_norm
 cj_q10_norm
-pts_2023_norm); 
+pts_norm); 
 
 *f_4_3 ;
 egen double f_4_3_1=rowmean(
@@ -644,18 +644,18 @@ egen double f_4_8=rowmean(f_4_8_1 f_4_8_2 f_4_8_3 ) ;
 
 *f_5_1 ;
 egen double f_5_1_1=rowmean(
-feel_safe_gallup_2023_norm
+feel_safe_gallup_norm
 q9_norm) ; 
 
 egen double f_5_1_2=rowmean(
-homicides_un_2023_norm) ; 
+homicides_un_norm) ; 
 
 egen double f_5_1_3=rowmean(
 nya_kidnapping_2017_norm); 
 
 egen double f_5_1_4=rowmean(
 q24_norm_2017
-prop_stolen_gallup_2023_norm
+property_stolen_gallup_norm
 assaulted_gallup_2014_norm); 
 
 egen double f_5_1_5=rowmean(
@@ -666,14 +666,14 @@ egen double f_5_1=rowmean(f_5_1_1 f_5_1_2 f_5_1_3 f_5_1_4 f_5_1_5) ;
 
 *f_5_2 ;
 egen double f_5_2_1=rowmean( 
-battle_deaths_2023_norm
-cas_one_sided_2023_norm); 
+battle_deaths_norm
+casualties_one_sided_norm); 
 
 egen double f_5_2_2=rowmean(
-terrorism_deaths_2020_norm
-terr_deaths_2016_2020_norm_mmx
-terrorism_events_2020_norm
-terr_evs_2016_2020_norm_mmx); 
+terrorism_deaths_short_norm
+terrorism_deaths_long_norm
+terrorism_events_short_norm
+terrorism_events_long_norm); 
 
 egen double f_5_2=rowmean(f_5_2_1 f_5_2_2) ; 
 

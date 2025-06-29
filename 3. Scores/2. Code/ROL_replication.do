@@ -43,7 +43,7 @@ global path2data "${path2SP}\3. Scores\1. Data"
 
 
 *Path 2dos: Path to do-files (Routines). 
-global path2dos  "${path2GH}\3. Scores\2. Code"
+global path2dos  "${path2GH}\3. Scores\2. Code\Routines"
 
 *Years of analysis
 global year_current "2024"
@@ -73,6 +73,12 @@ replace country="The Bahamas" if country=="Bahamas"
 replace country="The Gambia" if country=="Gambia"
 
 save "${path2SP}\1. Cleaning\QRQ\1. Data\3. Final\cost_of_lawyers.dta", replace
+
+
+*----- Import GPP - OLD QUESTIONS
+import excel "${path2SP}\1. Cleaning\GPP\1. Data\gpp_old_q.xlsx", sheet("gpp_old") firstrow clear
+
+save "${path2SP}\1. Cleaning\GPP\1. Data\gpp_old.dta", replace
 
 
 *----- Import TPS - ALREADY NORMALIZED
@@ -133,13 +139,19 @@ merge 1:1 country using "${path2SP}\1. Cleaning\QRQ\1. Data\3. Final\cost_of_law
 drop _merge
 
 
-*----- GPP scores
+*----- GPP
+
+*Current scores
 merge 1:1 country using "${path2SP}\1. Cleaning\GPP\1. Data\country_averages.dta"
 *drop if _merge==2
 drop _merge
 
+*OLD questions
+merge 1:1 country using "${path2SP}\1. Cleaning\GPP\1. Data\gpp_old.dta"
+drop _merge
 
-*----- TPS scores
+
+*----- TPS
 merge 1:1 country using "${path2SP}\1. Cleaning\TPS\1. Data\2. Clean\tps_index.dta"
 drop _merge
 
@@ -169,7 +181,7 @@ Excel Formula
 order country
 
 *----- Min max standarization for QRQ and GPP questions
-foreach var of varlist cc_q1_norm-q43_G1_norm {
+foreach var of varlist cc_q1_norm-q45q_norm_2016 {
 gen double `var'_mmx= (`var'-`var'2)/(`var'1-`var'2)
 replace `var'_mmx=1 if `var'_mmx>1 & `var'_mmx!=. 
 replace `var'_mmx=0 if `var'_mmx<0
